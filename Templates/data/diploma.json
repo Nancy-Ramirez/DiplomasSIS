@@ -1,0 +1,82 @@
+{
+    "canvas": {
+        "width": 800,
+        "height": 600
+    },
+    "elements": [
+        {
+            "type": "text",
+            "content": "DIPLOMA DE RECONOCIMIENTO",
+            "x": 400,
+            "y": 100,
+            "fontSize": 28,
+            "fontFamily": "Arial",
+            "fontWeight": "bold",
+            "color": "#000",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "content": "Se otorga el presente reconocimiento a:",
+            "x": 400,
+            "y": 180,
+            "fontSize": 18,
+            "fontFamily": "Arial",
+            "color": "#333",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "content": "Juan Pérez",
+            "x": 400,
+            "y": 230,
+            "fontSize": 24,
+            "fontFamily": "Arial",
+            "fontWeight": "bold",
+            "color": "#0056b3",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "content": "Por su destacada participación en el curso de Programación",
+            "x": 400,
+            "y": 280,
+            "fontSize": 16,
+            "fontFamily": "Arial",
+            "color": "#333",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "content": "Fecha de emisión: 02/03/2025",
+            "x": 400,
+            "y": 350,
+            "fontSize": 14,
+            "fontFamily": "Arial",
+            "color": "#666",
+            "align": "center"
+        },
+        {
+            "type": "image",
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Signature_Blank.png/800px-Signature_Blank.png",
+            "x": 550,
+            "y": 450,
+            "width": 120,
+            "height": 60
+        },
+        {
+            "type": "image",
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Seal_of_the_United_States_Department_of_Justice.svg/1024px-Seal_of_the_United_States_Department_of_Justice.svg.png",
+            "x": 600,
+            "y": 500,
+            "width": 100,
+            "height": 100
+        },
+        {
+            "type": "border",
+            "style": "solid",
+            "color": "#000",
+            "thickness": 5
+        }
+    ]
+}
