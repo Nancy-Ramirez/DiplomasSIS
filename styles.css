@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .bg-primary {
+    background-color: #1B2E5C ; /*blue*/
+  }
+  .bg-secondary {
+    background-color: #c9a341 ; /*dorado*/
+  }
+  .bg-neutral{
+    background-color: #ffffff ; /*white*/
+  }
+  .bg-accent {
+    background-color: #4D4D4D ; /*gray*/
+  }
+  .bg-light {
+    background-color: #EAE0C8 ; /*creamy*/
+  }
+
+  .text-primary {
+    color: #1B2E5C ; /*blue*/
+  }
+  .text-secondary {
+    color: #c9a341 ; /*dorado*/
+  }
+  .text-neutral{
+    color: #ffffff ; /*white*/
+  }
+  .text-accent {
+   color: #4D4D4D ; /*gray*/
+  }
+  .text-light {
+    color: #EAE0C8 ; /*creamy*/
+  }
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+/*INICIO*/
+
+  /* ******************************************************************** */
+.option-box {
+    border: 2px solid #1B2E5C; /* Borde gris */
+    padding: 1.5rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 180px;
+    background-color: #e5e7eb; /* Fondo gris */
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .option-box h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937; /* Texto gris oscuro */
+    margin-top: 0.5rem;
+  }
+  
+  .hover-effect:hover {
+    background-color: #142141;
+    color: white;
+    border: #1B2E5C;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .hover-effect:hover h2 {
+    color: white;
+    border: #1B2E5C;
+  }
+
+  .option-box img {
+    transition: filter 0.3s ease-in-out;
+  }
+  
+  .hover-effect:hover img {
+    filter: invert(1) brightness(2); /* Convierte la imagen a blanco */
+  }
+
+  /* ******************************************************************** */
+  
