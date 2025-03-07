@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script> <!--CDN TAILWIND-->
+  <title>Inicio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="inicio-container">
+    <header class="text-gray-600 body-font">
+      <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center border-2 border-gray-200">
+        <a class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+          <img src="src/images/2.png" alt="" class="w-12" />
+          <span class="ml-3 text-xl">Aún no sé cómo se llama esta fok</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="text-gray-600 body-font border-2 border-gray-200 py-5 mx-4 mt-15">
+      <div class="container px-5 mx-auto">
+        <!-- Contenedor de las cajas usando Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-4">
+          
+          <!-- Caja 1 -->
+          <a href="Templates/html/diplomas/diplomas.html">
+            <div class="option-box hover-effect">
+              <img src="src/images/diplomas.png" alt="" class="w-20" />
+              <h2>Diplomas</h2>
+            </div>
+          </a>
+
+          <!-- Caja 2 -->
+          <div class="option-box hover-effect">
+            <img src="src/images/cartas.png" alt="" class="w-15" />
+            <h2>Cartas</h2>
+          </div>
+
+          <!-- Caja 3 -->
+          <div class="option-box hover-effect">
+            <img src="src/images/oficios.png" alt="" class="w-18" />
+            <h2>Oficios</h2>
+          </div>
+
+          <!-- Caja 4 -->
+          <div class="option-box hover-effect">
+            <img src="src/images/Memorandum.png" alt="" class="w-20" />
+            <h2>Memorandum</h2>
+          </div>
+
+          <!-- Caja 5 -->
+          <div class="option-box hover-effect">
+            <img src="src/images/circulares.png" alt="" class="w-18" />
+            <h2>Circulares</h2>
+          </div>
+
+          <!-- Caja 6 -->
+          <div class="option-box hover-effect">
+            <img src="src/images/firmas.png" alt="" class="w-20" />
+            <h2>Firmas y sellos</h2>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <script src="Templates/js/inicio.js"></script>
+  </body>
+</html>
