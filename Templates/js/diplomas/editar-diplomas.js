@@ -22,7 +22,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, align) {
     const words = text.split(" ");
     let line = "";
     let lines = [];
-    let currentY = y;
+    let currentY = y; // Posición Y inicial del texto
 
     const leftMargin = 30;
     const rightMargin = 30;
@@ -35,45 +35,53 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, align) {
         const testWidth = metrics.width;
 
         if (testWidth > adjustedMaxWidth && i > 0) {
-            lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width });
+            lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width, x: x, y: currentY });
             line = words[i] + " ";
             currentY += lineHeight;
         } else {
             line = testLine;
         }
     }
-    lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width });
+    lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width, x: x, y: currentY });
 
     // Calcular el ancho máximo del párrafo
     const textWidth = Math.max(...lines.map((line) => line.width));
 
-    // Dibujar las líneas con alineación dentro del párrafo
+    // Ajustar el punto de inicio del párrafo según la alineación
+    let paragraphX = x;
+    if (align === "center") {
+        paragraphX = x - textWidth / 2;
+    } else if (align === "right") {
+        paragraphX = x - textWidth;
+    }
+    paragraphX = Math.max(leftMargin, Math.min(paragraphX, canvas.width - textWidth - rightMargin));
+
+    // Dibujar las líneas
     lines.forEach((lineObj) => {
-        let adjustedX = x; // Punto de inicio fijo (borde izquierdo del párrafo)
+        let adjustedX = paragraphX;
         if (align === "center") {
-            adjustedX = x + (textWidth - lineObj.width) / 2;
+            adjustedX = paragraphX + (textWidth - lineObj.width) / 2;
         } else if (align === "right") {
-            adjustedX = x + (textWidth - lineObj.width);
+            adjustedX = paragraphX + (textWidth - lineObj.width);
         } else if (align === "justify" && lineObj.text.split(" ").length > 1) {
             const wordsInLine = lineObj.text.split(" ");
             const totalSpaces = wordsInLine.length - 1;
             const spaceWidth = (adjustedMaxWidth - ctx.measureText(wordsInLine.join("")).width) / totalSpaces;
-            let currentX = x;
+            let currentX = paragraphX;
             wordsInLine.forEach((word, idx) => {
-                ctx.fillText(word, currentX, currentY);
+                ctx.fillText(word, currentX, lineObj.y);
                 currentX += ctx.measureText(word).width + (idx < totalSpaces ? spaceWidth : 0);
             });
             return;
         }
-        ctx.fillText(lineObj.text, adjustedX, currentY);
-        currentY += lineHeight;
+        ctx.fillText(lineObj.text, adjustedX, lineObj.y);
     });
 
-    // Devolver líneas para el rectángulo de selección
+    // Devolver líneas con posiciones ajustadas
     return lines.map((lineObj) => ({
         text: lineObj.text,
-        x: x, // Siempre el borde izquierdo del párrafo
-        y: currentY - lineHeight,
+        x: paragraphX,
+        y: lineObj.y,
         width: lineObj.width
     }));
 }
@@ -88,7 +96,6 @@ function renderizarDiploma() {
             const maxWidth = canvas.width - 60;
             const lineHeight = item.fontSize * 1.2;
 
-            // Usar las posiciones originales del JSON sin modificarlas
             const boundedX = item.x;
             const boundedY = item.y;
             const lines = wrapText(ctx, item.content, boundedX, boundedY, maxWidth, lineHeight, item.align || "left");
@@ -97,21 +104,34 @@ function renderizarDiploma() {
                 ctx.strokeStyle = "red";
                 ctx.lineWidth = 2;
                 const textWidth = Math.max(...lines.map((line) => ctx.measureText(line.text).width));
-                const textHeight = lines.length * lineHeight;
+                const firstLineY = lines[0].y; // Posición Y de la primera línea
+                const lastLineY = lines[lines.length - 1].y; // Posición Y de la última línea
+                const textHeight = lastLineY - firstLineY + lineHeight; // Altura total incluyendo la última línea
 
-                // Rectángulo fijo desde el borde izquierdo (boundedX)
-                ctx.strokeRect(boundedX - 5, boundedY - item.fontSize - 5, textWidth + 10, textHeight + 5);
+                const paragraphX = lines[0].x; // Borde izquierdo del párrafo
+
+                // Depuración
+                console.log({
+                    paragraphX,
+                    firstLineY,
+                    lastLineY,
+                    textWidth,
+                    textHeight
+                });
+
+                // Dibujar el rectángulo
+                ctx.strokeRect(
+                    paragraphX - 5,           // X inicial
+                    firstLineY - item.fontSize - 5, // Y inicial (arriba de la primera línea)
+                    textWidth + 10,           // Ancho
+                    textHeight + 10           // Altura total + margen
+                );
             }
         } else if (item.type === "image") {
             const img = new Image();
             img.src = item.src;
-            img.onload = () => {
-                ctx.drawImage(img, item.x, item.y, item.width, item.height);
-            };
-            // Dibujar inmediatamente si la imagen ya está cargada
-            if (img.complete) {
-                ctx.drawImage(img, item.x, item.y, item.width, item.height);
-            }
+            img.onload = () => ctx.drawImage(img, item.x, item.y, item.width, item.height);
+            if (img.complete) ctx.drawImage(img, item.x, item.y, item.width, item.height);
         } else if (item.type === "border") {
             ctx.strokeStyle = item.color;
             ctx.lineWidth = item.thickness;
@@ -263,22 +283,28 @@ canvas.addEventListener("mousedown", (e) => {
         if (item.type === "text") {
             const maxWidth = canvas.width - 60;
             const lineHeight = item.fontSize * 1.2;
-            const boundedX = item.x; // Usar posición original del JSON
+            const boundedX = item.x;
             const boundedY = item.y;
             const lines = wrapText(ctx, item.content, boundedX, boundedY, maxWidth, lineHeight, item.align || "left");
+
             const textWidth = Math.max(...lines.map((line) => ctx.measureText(line.text).width));
             const textHeight = lines.length * lineHeight;
+            const paragraphX = lines[0].x;
+            const rectX = paragraphX - 5;
+            const rectY = boundedY - item.fontSize - 5;
+            const rectWidth = textWidth + 10;
+            const rectHeight = textHeight + 10;
 
-            let rectX = boundedX - 5; // Borde izquierdo fijo
+            // Verificar si el clic está dentro del rectángulo
             if (
                 x >= rectX &&
-                x <= rectX + textWidth + 10 &&
-                y >= boundedY - item.fontSize - 5 &&
-                y <= boundedY - item.fontSize + textHeight + 5
+                x <= rectX + rectWidth &&
+                y >= rectY &&
+                y <= rectY + rectHeight
             ) {
                 seleccionadoTemp = index;
-                offsetX = x - boundedX;
-                offsetY = y - boundedY;
+                offsetX = x - item.x; // Offset respecto a item.x
+                offsetY = y - item.y; // Offset respecto a item.y
                 arrastrando = true;
             }
         } else if (item.type === "image") {
@@ -289,14 +315,19 @@ canvas.addEventListener("mousedown", (e) => {
                 arrastrando = true;
             }
         }
-
-        if (seleccionadoTemp !== null) {
-            seleccionado = seleccionadoTemp;
-            console.log("Elemento seleccionado:", seleccionado);
-            renderizarDiploma();
-            generarEditor();
-        }
     });
+
+    // Actualizar seleccionado solo si se encontró un elemento
+    if (seleccionadoTemp !== null) {
+        seleccionado = seleccionadoTemp;
+        console.log("Elemento seleccionado:", seleccionado);
+    } else {
+        seleccionado = null; // Restablecer si no se cliqueó en ningún elemento
+        arrastrando = false; // Asegurar que no se arrastre nada
+    }
+
+    renderizarDiploma();
+    generarEditor();
 });
 
 canvas.addEventListener("mousemove", (e) => {
