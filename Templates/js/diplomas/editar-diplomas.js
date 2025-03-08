@@ -6,7 +6,6 @@ let diplomaData = {};
 let seleccionado = null;
 let offsetX, offsetY, arrastrando = false;
 
-// Cargar el JSON y renderizar el Diploma
 async function cargarDiploma() {
     try {
         const response = await fetch("../../data/diploma.json");
@@ -19,83 +18,215 @@ async function cargarDiploma() {
     }
 }
 
-// Limpiar el Canvas y renderizar solo los elementos existentes
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, align) {
+    const words = text.split(" ");
+    let line = "";
+    let lines = [];
+    let currentY = y;
+
+    const leftMargin = 30;
+    const rightMargin = 30;
+    const adjustedMaxWidth = maxWidth - leftMargin - rightMargin;
+
+    // Construir las líneas
+    for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + " ";
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+
+        if (testWidth > adjustedMaxWidth && i > 0) {
+            lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width });
+            line = words[i] + " ";
+            currentY += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    lines.push({ text: line.trim(), width: ctx.measureText(line.trim()).width });
+
+    // Calcular el ancho máximo del párrafo
+    const textWidth = Math.max(...lines.map((line) => line.width));
+
+    // Dibujar las líneas con alineación dentro del párrafo
+    lines.forEach((lineObj) => {
+        let adjustedX = x; // Punto de inicio fijo (borde izquierdo del párrafo)
+        if (align === "center") {
+            adjustedX = x + (textWidth - lineObj.width) / 2;
+        } else if (align === "right") {
+            adjustedX = x + (textWidth - lineObj.width);
+        } else if (align === "justify" && lineObj.text.split(" ").length > 1) {
+            const wordsInLine = lineObj.text.split(" ");
+            const totalSpaces = wordsInLine.length - 1;
+            const spaceWidth = (adjustedMaxWidth - ctx.measureText(wordsInLine.join("")).width) / totalSpaces;
+            let currentX = x;
+            wordsInLine.forEach((word, idx) => {
+                ctx.fillText(word, currentX, currentY);
+                currentX += ctx.measureText(word).width + (idx < totalSpaces ? spaceWidth : 0);
+            });
+            return;
+        }
+        ctx.fillText(lineObj.text, adjustedX, currentY);
+        currentY += lineHeight;
+    });
+
+    // Devolver líneas para el rectángulo de selección
+    return lines.map((lineObj) => ({
+        text: lineObj.text,
+        x: x, // Siempre el borde izquierdo del párrafo
+        y: currentY - lineHeight,
+        width: lineObj.width
+    }));
+}
+
 function renderizarDiploma() {
-    // Limpiar canvas antes de redibujar
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     diplomaData.elements.forEach((item, index) => {
         if (item.type === "text") {
             ctx.font = `${item.fontWeight || ""} ${item.fontSize}px ${item.fontFamily}`;
-            ctx.fillStyle = item.color;
-            ctx.textAlign = item.align || "left";
-            ctx.fillText(item.content, item.x, item.y);
+            ctx.fillStyle = item.color || "#000000";
+            const maxWidth = canvas.width - 60;
+            const lineHeight = item.fontSize * 1.2;
+
+            // Usar las posiciones originales del JSON sin modificarlas
+            const boundedX = item.x;
+            const boundedY = item.y;
+            const lines = wrapText(ctx, item.content, boundedX, boundedY, maxWidth, lineHeight, item.align || "left");
+
+            if (seleccionado === index) {
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 2;
+                const textWidth = Math.max(...lines.map((line) => ctx.measureText(line.text).width));
+                const textHeight = lines.length * lineHeight;
+
+                // Rectángulo fijo desde el borde izquierdo (boundedX)
+                ctx.strokeRect(boundedX - 5, boundedY - item.fontSize - 5, textWidth + 10, textHeight + 5);
+            }
         } else if (item.type === "image") {
             const img = new Image();
             img.src = item.src;
             img.onload = () => {
                 ctx.drawImage(img, item.x, item.y, item.width, item.height);
             };
+            // Dibujar inmediatamente si la imagen ya está cargada
+            if (img.complete) {
+                ctx.drawImage(img, item.x, item.y, item.width, item.height);
+            }
         } else if (item.type === "border") {
             ctx.strokeStyle = item.color;
             ctx.lineWidth = item.thickness;
             ctx.strokeRect(0, 0, canvas.width, canvas.height);
         }
-
-        // Si el elemento está seleccionado, dibujar un borde
-        if (seleccionado !== null && seleccionado === index) {
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 2;
-            if (item.type === "text") {
-                const textWidth = ctx.measureText(item.content).width;
-                const textHeight = item.fontSize;
-                ctx.strokeRect(item.x - 5, item.y - item.fontSize, textWidth + 10, textHeight + 5);
-            } else if (item.type === "image") {
-                ctx.strokeRect(item.x - 5, item.y - 5, item.width + 10, item.height + 10);
-            }
-        }
     });
-    generarEditor(); // Actualizar editor del sidebar
 }
 
-// Generar el editor en el sidebar
 function generarEditor() {
-    editor.innerHTML = ""; // Limpiar el editor antes de agregar elementos
+    editor.innerHTML = "";
+    console.log("Generando editor para seleccionado:", seleccionado);
 
     if (seleccionado !== null) {
         const item = diplomaData.elements[seleccionado];
 
-        // Título de edición
         const titulo = document.createElement("h3");
         titulo.innerText = `Editar: ${item.type === "text" ? "Texto" : item.type === "image" ? "Imagen" : "Borde"}`;
         titulo.classList.add("font-bold", "mb-2");
+        editor.appendChild(titulo);
 
-        // Editar texto
         if (item.type === "text") {
+            // Contenido del texto
             const inputTexto = document.createElement("input");
             inputTexto.type = "text";
             inputTexto.value = item.content;
             inputTexto.classList.add("w-full", "p-2", "border", "rounded", "mb-2");
-            inputTexto.addEventListener("focus", (e) => {
-                inputTexto.select(); // Selecciona todo el texto al enfocarse
-            });
-
             inputTexto.addEventListener("input", (e) => {
                 diplomaData.elements[seleccionado].content = e.target.value;
-                renderizarDiploma();
+                requestAnimationFrame(renderizarDiploma);
             });
-
-            inputTexto.addEventListener("blur", (e) => {
-                // Cuando el campo pierde el foco, se guardan los cambios
-                diplomaData.elements[seleccionado].content = e.target.value;
-                renderizarDiploma();
-            });
-
-            editor.appendChild(titulo);
+            editor.appendChild(document.createElement("label")).innerText = "Contenido:";
             editor.appendChild(inputTexto);
+            inputTexto.focus();
+
+            // 1. Tipo de fuente
+            const selectFont = document.createElement("select");
+            selectFont.classList.add("w-full", "p-2", "border", "rounded", "mb-2");
+            const fonts = ["Arial", "Times New Roman", "Courier New", "Verdana", "Georgia"];
+            fonts.forEach((font) => {
+                const option = document.createElement("option");
+                option.value = font;
+                option.text = font;
+                if (font === item.fontFamily) option.selected = true;
+                selectFont.appendChild(option);
+            });
+            selectFont.addEventListener("change", (e) => {
+                diplomaData.elements[seleccionado].fontFamily = e.target.value;
+                requestAnimationFrame(renderizarDiploma);
+            });
+            editor.appendChild(document.createElement("label")).innerText = "Fuente:";
+            editor.appendChild(selectFont);
+
+            // 2. Color de letra
+            const inputColor = document.createElement("input");
+            inputColor.type = "color";
+            inputColor.value = item.color || "#000000";
+            inputColor.classList.add("w-full", "h-12", "p-2", "border", "rounded", "mb-2");
+            inputColor.addEventListener("input", (e) => {
+                diplomaData.elements[seleccionado].color = e.target.value;
+                requestAnimationFrame(renderizarDiploma);
+            });
+            editor.appendChild(document.createElement("label")).innerText = "Color:";
+            editor.appendChild(inputColor);
+
+            // 3. Tamaño de letra
+            const inputSize = document.createElement("input");
+            inputSize.type = "number";
+            inputSize.min = 8;
+            inputSize.max = 72;
+            inputSize.value = item.fontSize || 20;
+            inputSize.classList.add("w-full", "p-2", "border", "rounded", "mb-2");
+            inputSize.addEventListener("input", (e) => {
+                diplomaData.elements[seleccionado].fontSize = parseInt(e.target.value);
+                requestAnimationFrame(renderizarDiploma);
+            });
+            editor.appendChild(document.createElement("label")).innerText = "Tamaño (px):";
+            editor.appendChild(inputSize);
+
+            // 4. Grosor de texto
+            const selectWeight = document.createElement("select");
+            selectWeight.classList.add("w-full", "p-2", "border", "rounded", "mb-2");
+            const weights = ["normal", "bold", "lighter", "bolder"];
+            weights.forEach((weight) => {
+                const option = document.createElement("option");
+                option.value = weight;
+                option.text = weight;
+                if (weight === (item.fontWeight || "normal")) option.selected = true;
+                selectWeight.appendChild(option);
+            });
+            selectWeight.addEventListener("change", (e) => {
+                diplomaData.elements[seleccionado].fontWeight = e.target.value;
+                requestAnimationFrame(renderizarDiploma);
+            });
+            editor.appendChild(document.createElement("label")).innerText = "Grosor:";
+            editor.appendChild(selectWeight);
+
+            // 5. Alineación
+            const selectAlign = document.createElement("select");
+            selectAlign.classList.add("w-full", "p-2", "border", "rounded", "mb-2");
+            const aligns = ["left", "center", "right", "justify"];
+            aligns.forEach((align) => {
+                const option = document.createElement("option");
+                option.value = align;
+                option.text = align;
+                if (align === (item.align || "left")) option.selected = true;
+                selectAlign.appendChild(option);
+            });
+            selectAlign.addEventListener("change", (e) => {
+                diplomaData.elements[seleccionado].align = e.target.value;
+                requestAnimationFrame(renderizarDiploma);
+            });
+            editor.appendChild(document.createElement("label")).innerText = "Alineación:";
+            editor.appendChild(selectAlign);
         }
 
-        // Editar imagen
         if (item.type === "image") {
             const inputSrc = document.createElement("input");
             inputSrc.type = "text";
@@ -105,12 +236,10 @@ function generarEditor() {
                 diplomaData.elements[seleccionado].src = e.target.value;
                 renderizarDiploma();
             });
-
-            editor.appendChild(titulo);
+            editor.appendChild(document.createElement("label")).innerText = "URL de imagen:";
             editor.appendChild(inputSrc);
         }
 
-        // Editar borde
         if (item.type === "border") {
             const inputColor = document.createElement("input");
             inputColor.type = "color";
@@ -120,27 +249,36 @@ function generarEditor() {
                 diplomaData.elements[seleccionado].color = e.target.value;
                 renderizarDiploma();
             });
-
-            editor.appendChild(titulo);
+            editor.appendChild(document.createElement("label")).innerText = "Color del borde:";
             editor.appendChild(inputColor);
         }
     }
 }
 
-// Detectar clic en el Canvas para seleccionar un elemento
 canvas.addEventListener("mousedown", (e) => {
     const { offsetX: x, offsetY: y } = e;
     let seleccionadoTemp = null;
 
     diplomaData.elements.forEach((item, index) => {
         if (item.type === "text") {
-            const textWidth = ctx.measureText(item.content).width;
-            const textHeight = item.fontSize;
+            const maxWidth = canvas.width - 60;
+            const lineHeight = item.fontSize * 1.2;
+            const boundedX = item.x; // Usar posición original del JSON
+            const boundedY = item.y;
+            const lines = wrapText(ctx, item.content, boundedX, boundedY, maxWidth, lineHeight, item.align || "left");
+            const textWidth = Math.max(...lines.map((line) => ctx.measureText(line.text).width));
+            const textHeight = lines.length * lineHeight;
 
-            if (x >= item.x - 5 && x <= item.x + textWidth + 5 && y >= item.y - textHeight - 5 && y <= item.y + 5) {
+            let rectX = boundedX - 5; // Borde izquierdo fijo
+            if (
+                x >= rectX &&
+                x <= rectX + textWidth + 10 &&
+                y >= boundedY - item.fontSize - 5 &&
+                y <= boundedY - item.fontSize + textHeight + 5
+            ) {
                 seleccionadoTemp = index;
-                offsetX = x - item.x;
-                offsetY = y - item.y;
+                offsetX = x - boundedX;
+                offsetY = y - boundedY;
                 arrastrando = true;
             }
         } else if (item.type === "image") {
@@ -154,21 +292,19 @@ canvas.addEventListener("mousedown", (e) => {
 
         if (seleccionadoTemp !== null) {
             seleccionado = seleccionadoTemp;
+            console.log("Elemento seleccionado:", seleccionado);
             renderizarDiploma();
+            generarEditor();
         }
     });
 });
 
-// Mover el texto en el Canvas con el mouse
 canvas.addEventListener("mousemove", (e) => {
     if (arrastrando && seleccionado !== null) {
         const { offsetX: x, offsetY: y } = e;
         const item = diplomaData.elements[seleccionado];
 
-        if (item.type === "text") {
-            item.x = x - offsetX;
-            item.y = y - offsetY;
-        } else if (item.type === "image") {
+        if (item.type === "text" || item.type === "image") {
             item.x = x - offsetX;
             item.y = y - offsetY;
         }
@@ -176,12 +312,10 @@ canvas.addEventListener("mousemove", (e) => {
     }
 });
 
-// Soltar el texto (deja de arrastrar)
 canvas.addEventListener("mouseup", () => {
     arrastrando = false;
 });
 
-// Descargar el diploma como imagen
 document.getElementById("descargar").addEventListener("click", () => {
     const link = document.createElement("a");
     link.download = "Diploma.png";
@@ -189,5 +323,4 @@ document.getElementById("descargar").addEventListener("click", () => {
     link.click();
 });
 
-// Cargar diploma al iniciar
 cargarDiploma();
