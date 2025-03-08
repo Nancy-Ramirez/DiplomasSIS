@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- CDN Tailwind -->
+    <title>Gestionar Cartas</title>
+    <link rel="stylesheet" href="../../../styles.css" />
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Título en la parte superior -->
+    <div class="w-full h-1/6 flex items-center justify-center bg-gray-100 shadow-md">
+        <h1 class="text-lg font-bold">Gestionar Cartas</h1>
+    </div>
+
+    <!-- Contenedor con dos columnas -->
+    <div class="flex flex-1">
+        <!-- Columna izquierda - Configuraciones -->
+        <div class="w-1/2 p-8">
+            <h2 class="text-xl font-bold text-center text-gray-800 mb-6">
+                Configuraciones Carta
+            </h2>
+            <div class="space-y-6">
+                
+                <!-- Selección de Tipo de Letra -->
+                <div class="flex items-center space-x-4">
+                    <label for="letra" class="w-1/4 text-sm font-medium text-gray-700">Tipo de Letra</label>
+                    <select id="letra" name="letra" required 
+                        class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">-- Selecciona --</option>
+                        <option value="arial">Arial</option>
+                        <option value="times">Times New Roman</option>
+                        <option value="courier">Courier New</option>
+                        <option value="verdana">Verdana</option>
+                        <option value="calibri">Calibri</option>
+                    </select>
+                </div>
+
+                <!-- Selección de Tamaño de Letra -->
+                <div class="flex items-center space-x-4">
+                    <label for="tamaño-letra" class="w-1/4 text-sm font-medium text-gray-700">Tamaño de Letra</label>
+                    <select id="tamaño-letra" name="tamaño-letra" required 
+                        class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">-- Selecciona --</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                        <option value="18">18</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <label for="tamaño-papel" class="w-1/4 text-sm font-medium text-gray-700">Tamaño de Papel</label>
+                    <select name="tamaño-papel" id="tamaño-papel" required class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                        <option value="">--Selecciona--</option>
+                        <option value="carta">Oficio</option>
+                        <option value="oficio">Oficio</option>
+                        <option value="tabloide">Tabloide</option>
+                        <option value="Ejecutivo">Ejecutivo</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <label for="alineacion" class="w-1/4 text-sm font-medium text-gray-700">Alineacion</label>
+                    <button id="left" class="align-btn p-2 bg-gray-100 rounded hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
+                        <img src="/src/images/izquierda.png" alt="Alinear izquierda" class="w-6 h-6" />
+                    </button>
+                    
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Columna derecha - Vacía por ahora -->
+        <div class="w-1/2 p-8">
+            
+        </div>
+    </div>
+</body>
+</html>

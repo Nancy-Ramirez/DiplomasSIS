@@ -1,3 +1,8 @@
 *** Instalar Node Modules  ***
   npm init -y
 -
+
+***** Librerias de python ******
+pip install gunicorn
+pip install flask
+pip install waitress
