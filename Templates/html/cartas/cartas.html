@@ -30,11 +30,11 @@
                     <select id="letra" name="letra" required 
                         class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
                         <option value="">-- Selecciona --</option>
-                        <option value="arial">Arial</option>
-                        <option value="times">Times New Roman</option>
-                        <option value="courier">Courier New</option>
-                        <option value="verdana">Verdana</option>
-                        <option value="calibri">Calibri</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Calibri">Calibri</option>
                     </select>
                 </div>
 
@@ -55,28 +55,123 @@
                     <label for="tamaño-papel" class="w-1/4 text-sm font-medium text-gray-700">Tamaño de Papel</label>
                     <select name="tamaño-papel" id="tamaño-papel" required class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
                         <option value="">--Selecciona--</option>
-                        <option value="carta">Oficio</option>
-                        <option value="oficio">Oficio</option>
-                        <option value="tabloide">Tabloide</option>
+                        <option value="Carta">Carta</option>
+                        <option value="Oficio">Oficio</option>
+                        <option value="Tabloide">Tabloide</option>
                         <option value="Ejecutivo">Ejecutivo</option>
                     </select>
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <label for="alineacion" class="w-1/4 text-sm font-medium text-gray-700">Alineacion</label>
-                    <button id="left" class="align-btn p-2 bg-gray-100 rounded hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
-                        <img src="/src/images/izquierda.png" alt="Alinear izquierda" class="w-6 h-6" />
-                    </button>
-                    
+                    <label class="w-1/4 text-sm font-medium text-gray-700">Alineación</label>
+                
+                    <div class="flex space-x-2">
+                        <!-- Alinear Izquierda -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="alineacion" value="left" id="left" class="sr-only peer">
+                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
+                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
+                                <img src="../../../src/images/izquierda.png" alt="Alinear Izquierda" class="w-6 h-6" />
+                            </div>
+                        </label>
+                
+                        <!-- Centrar -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="alineacion" value="center" id="center" class="sr-only peer">
+                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
+                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
+                                <img src="../../../src/images/centro.png" alt="Centrar texto" class="w-6 h-6" />
+                            </div>
+                        </label>
+                
+                        <!-- Alinear Derecha -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="alineacion" value="right" id="right" class="sr-only peer">
+                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
+                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
+                                <img src="../../../src/images/derecha.png" alt="Alinear Derecha" class="w-6 h-6" />
+                            </div>
+                        </label>
+                
+                        <!-- Justificar -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="alineacion" value="justify" id="justify" class="sr-only peer">
+                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
+                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
+                                <img src="../../../src/images/justificado.png" alt="Justificar texto" class="w-6 h-6" />
+                            </div>
+                        </label>
+                    </div>
                 </div>
-
             </div>
         </div>
 
         <!-- Columna derecha - Vacía por ahora -->
         <div class="w-1/2 p-8">
-            
+         <!-- Membrete (Subir Archivo - Imagen) -->
+         <div>
+            <label class="block text-gray-700">Membrete (Imagen)</label>
+            <div class="flex items-center space-x-2 bg-white p-2 rounded-md shadow">
+                <input type="file" id="membrete" accept="image/png, image/jpeg" class="hidden">
+                <!-- 📌 Botón con animaciones y efectos -->
+                <button id="fileButton" class="bg-gray-300 px-3 py-1 rounded-md cursor-pointer 
+                    hover:bg-gray-400 hover:shadow-lg transition-all active:scale-95">
+                    Seleccionar imagen
+                </button>
+                <span id="fileName" class="text-gray-600">Ningún archivo seleccionado</span>
+            </div>
         </div>
+
+        <div class="mt-2">
+            <img id="previewImage" class="hidden w-full h-40 object-contain rounded-md shadow">
+        </div>
+
+
+        <div>
+            <label class="block text-gray-700">Fecha</label>
+            <div class="flex items-center bg-white p-2 rounded-md shadow">
+                <input type="date" id="fecha" class="w-full outline-none">
+            </div>
+        </div>
+        <!-- Destinatario -->
+        <div>
+            <label class="block text-gray-700">Destinatario</label>
+            <textarea id="destinatario" class="w-full p-2 rounded-md shadow resize-none"></textarea>
+        </div>
+        <!-- Cuerpo -->
+        <div>
+            <label class="block text-gray-700">Cuerpo</label>
+            <textarea id="cuerpo" class="w-full p-2 rounded-md shadow resize-none"></textarea>
+        </div>
+
+        <!-- Contenedor de Firmantes -->
+        <div class="grid grid-cols-2 gap-4 items-start">
+            <!-- Columna Izquierda (Nombres de Firmantes) -->
+            <div class="flex flex-col items-center">
+                <label class="block text-gray-700">Cantidad de Firmantes (1-4)</label>
+                <input type="number" id="cantidadFirmantes" min="1" max="4"
+                    class="w-20 p-2 rounded-md shadow text-center mt-2">
+            </div>
+
+
+            <!-- Columna Derecha (Cantidad de Firmantes) -->
+            <div>
+                <label class="block text-gray-700">Nombre de Firmantes</label>
+                <div id="firmantesContainer" class="space-y-2">
+                    <!-- Aquí se agregarán dinámicamente los inputs -->
+                </div>
+            </div>
+        </div>
+
+        <button id="enviar" class="w-full bg-blue-500 text-white py-2 rounded-md shadow 
+        hover:bg-blue-600 hover:shadow-lg transition-all active:scale-95 mt-6">
+        Enviar
+        </button>
+
+    <p id="responseMessage" class="text-center text-gray-700"></p>
+
     </div>
+
+    <script src="../../js/cartas/renderer.js"></script>
 </body>
 </html>
