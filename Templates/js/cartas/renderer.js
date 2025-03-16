@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const fileButton = document.getElementById("fileButton");
     const fileInput = document.getElementById("membrete");
     const fileName = document.getElementById("fileName");
-    const previewImage = document.getElementById("previewImage");
     const cantidadFirmantes = document.getElementById("cantidadFirmantes");
     const firmantesContainer = document.getElementById("firmantesContainer");
     const sendButton = document.getElementById("enviar");
@@ -21,30 +20,12 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.click();
     });
 
-    // Evento para mostrar el nombre del archivo y su vista previa
+    // Evento para mostrar el nombre del archivo seleccionado
     fileInput.addEventListener("change", () => {
-        const file = fileInput.files[0];
-
-        if (file) {
-            fileName.textContent = file.name;
-
-            // Verificar si el archivo es una imagen
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    if (previewImage) {
-                        previewImage.src = e.target.result;
-                        previewImage.classList.remove("hidden");
-                    }
-                };
-                reader.readAsDataURL(file);
-            } else {
-                previewImage.classList.add("hidden");
-                alert("Por favor, selecciona un archivo de imagen válido.");
-            }
+        if (fileInput.files.length > 0) {
+            fileName.textContent = fileInput.files[0].name;
         } else {
             fileName.textContent = "Ningún archivo seleccionado";
-            previewImage.classList.add("hidden");
         }
     });
 
@@ -81,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Evento para enviar los datos de la carta al backend Flask
+    // Evento para enviar los datos de la carta al backend Flask y descargar el archivo
     sendButton.addEventListener("click", async () => {
         const numFirmantes = parseInt(cantidadFirmantes.value);
         if (isNaN(numFirmantes) || numFirmantes < 1 || numFirmantes > 4) {
@@ -135,12 +116,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(`❌ Error en la solicitud: ${response.statusText}`);
             }
 
-            const data = await response.json();
-            responseMessage.innerText = `✅ Respuesta del servidor: ${data.mensaje}`;
-            console.log("✅ Respuesta recibida:", data);
+            // 🔥 Descargar el archivo automáticamente
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "carta_generada.docx"; // Nombre del archivo
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            responseMessage.innerText = "✅ Documento generado y descargado exitosamente.";
         } catch (error) {
             console.error("❌ Error al enviar datos:", error);
-            responseMessage.innerText = "⚠️ Error al enviar los datos. Revisa la consola.";
+            responseMessage.innerText = "⚠️ Error al generar el documento.";
         }
     });
 });

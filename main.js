@@ -6,13 +6,13 @@ let mainWindow;
 let flaskProcess;
 
 app.whenReady().then(() => {
-    /*
+    
     // 📌 Ruta absoluta al backend
     const backendPath = path.join(__dirname, 'backend');
 
     // 🔹 Iniciar el servidor Flask como backend
     flaskProcess = spawn('python', ['wsgi.py'], {
-        cwd: backendPath,  // 📌 Directorio donde está wsgi.py
+        cwd: backendPath,
         shell: true
     });
 
@@ -25,9 +25,9 @@ app.whenReady().then(() => {
     });
 
     flaskProcess.on('close', (code) => {
-        console.log(`El proceso Flask terminó con código ${code}`);
+        console.log(`El proceso Flask termino con codigo ${code}`);
     });
-    */
+    
 
     // Crear la ventana de Electron para el frontend
     mainWindow = new BrowserWindow({
@@ -39,7 +39,6 @@ app.whenReady().then(() => {
         }
     });
 
-    // Cargar el archivo HTML local como frontend
     mainWindow.loadFile(path.join(__dirname, 'inicio.html'))
         .then(() => {
             console.log('✅ Frontend cargado desde inicio.html');
@@ -49,68 +48,39 @@ app.whenReady().then(() => {
         });
 });
 
-/*
-// Función para cerrar todos los procesos en el puerto 5000
-function killPortProcesses(port, callback) {
+// 🔥 Función para cerrar procesos en el puerto 5000
+function killPortProcesses(callback) {
     if (process.platform === 'win32') {
-        // En Windows, usar netstat para encontrar PIDs en el puerto
-        exec(`netstat -aon | findstr :${port}`, (err, stdout) => {
+        // 🔹 Cerrar cualquier proceso que use el puerto 5000
+        exec('netstat -ano | findstr :5000', (err, stdout) => {
             if (err) {
-                console.error(`❌ Error al buscar procesos en puerto ${port}: ${err.message}`);
+                console.error(`❌ Error al buscar procesos en puerto 5000: ${err.message}`);
                 callback(err);
                 return;
             }
 
             const lines = stdout.split('\n');
-            const pids = new Set(); // Usar Set para evitar duplicados
+            const pids = new Set();
 
             lines.forEach((line) => {
-                const match = line.match(/LISTENING\s+(\d+)/);
-                if (match) {
-                    pids.add(match[1]); // Agregar PID al conjunto
+                const parts = line.trim().split(/\s+/);
+                const pid = parts[parts.length - 1];
+
+                if (!isNaN(pid)) {
+                    pids.add(pid);
                 }
             });
 
             if (pids.size === 0) {
-                console.log(`✅ No se encontraron procesos en el puerto ${port}`);
+                console.log(`✅ No se encontraron procesos en el puerto 5000`);
                 callback(null);
                 return;
             }
 
-            // Matar cada PID encontrado
+            console.log(`🔴 Matando procesos en el puerto 5000...`);
             let remaining = pids.size;
             pids.forEach((pid) => {
-                exec(`taskkill /PID ${pid} /F`, (killErr, killStdout) => {
-                    if (killErr) {
-                        console.error(`❌ Error al matar PID ${pid}: ${killErr.message}`);
-                    } else {
-                        console.log(`✅ Proceso PID ${pid} terminado: ${killStdout}`);
-                    }
-                    remaining--;
-                    if (remaining === 0) callback(null); // Terminar cuando todos estén cerrados
-                });
-            });
-        });
-    } else {
-        // En sistemas Unix (Linux/Mac), usar lsof
-        exec(`lsof -i :${port} -t`, (err, stdout) => {
-            if (err) {
-                console.error(`❌ Error al buscar procesos en puerto ${port}: ${err.message}`);
-                callback(err);
-                return;
-            }
-
-            const pids = stdout.trim().split('\n').filter(Boolean);
-            if (pids.length === 0) {
-                console.log(`✅ No se encontraron procesos en el puerto ${port}`);
-                callback(null);
-                return;
-            }
-
-            // Matar cada PID encontrado
-            let remaining = pids.length;
-            pids.forEach((pid) => {
-                exec(`kill -9 ${pid}`, (killErr) => {
+                exec(`taskkill /PID ${pid} /F`, (killErr) => {
                     if (killErr) {
                         console.error(`❌ Error al matar PID ${pid}: ${killErr.message}`);
                     } else {
@@ -121,42 +91,59 @@ function killPortProcesses(port, callback) {
                 });
             });
         });
+
+        // 🔹 Alternativamente, matar directamente todos los procesos Python (si Flask no se cerró)
+        setTimeout(() => {
+            exec('taskkill /IM python.exe /F', (killErr) => {
+                if (killErr) {
+                    console.error(`⚠️ No se pudieron cerrar todos los procesos Python.`);
+                } else {
+                    console.log(`✅ Todos los procesos Python cerrados correctamente.`);
+                }
+            });
+        }, 2000);
+
+    } else {
+        // 🔹 En sistemas Unix (Linux/Mac)
+        exec('lsof -ti :5000 | xargs kill -9', (err) => {
+            if (err) {
+                console.error(`❌ Error al cerrar procesos en puerto 5000: ${err.message}`);
+            } else {
+                console.log(`✅ Todos los procesos en puerto 5000 fueron cerrados.`);
+            }
+            callback(null);
+        });
     }
 }
-*/
 
+// 📌 Al cerrar la aplicación, matamos Flask y los procesos en el puerto 5000
 app.on('window-all-closed', () => {
-    /*
-    // Intentar cerrar Flask de forma ordenada primero
     if (flaskProcess && !flaskProcess.killed) {
         console.log("🔴 Intentando cerrar Flask de forma ordenada...");
         flaskProcess.kill('SIGTERM');
 
-        // Dar un segundo para que Flask cierre
+        // 🔹 Esperar 1 segundo para ver si Flask cierra correctamente
         setTimeout(() => {
             if (!flaskProcess.killed) {
-                console.log("⚠️ Flask no cerró, forzando terminación...");
+                console.log("⚠️ Flask no cerro, forzando terminación...");
                 flaskProcess.kill('SIGKILL');
             }
         }, 1000);
-    }*/
+    }
 
-    /*
-        // Liberar el puerto 5000 matando todos los procesos asociados
+    // 🔥 Matar procesos en el puerto 5000
     console.log("🔍 Buscando y cerrando procesos en el puerto 5000...");
-    killPortProcesses(5000, (err) => {
+    killPortProcesses((err) => {
         if (err) {
             console.error('❌ Error al liberar el puerto 5000:', err);
         } else {
             console.log('✅ Puerto 5000 liberado exitosamente');
         }
-    
-        // Cerrar la aplicación si no es macOS
-        
-    });*/
-    if (process.platform !== 'darwin') app.quit();
+
+        if (process.platform !== 'darwin') app.quit();
+    });
 });
 
 app.on('quit', () => {
-    console.log('Aplicación cerrada completamente.');
+    console.log('🛑 Aplicacion cerrada completamente.');
 });
