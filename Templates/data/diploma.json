@@ -1,82 +1,191 @@
 {
     "canvas": {
-        "width": 800,
-        "height": 600
-    },
-    "elements": [
-        {
-            "type": "text",
-            "content": "DIPLOMA DE RECONOCIMIENTO",
-            "x": 400,
-            "y": 100,
-            "fontSize": 28,
-            "fontFamily": "Arial",
-            "fontWeight": "bold",
-            "color": "#000",
-            "align": "center"
-        },
-        {
-            "type": "text",
-            "content": "Se otorga el presente reconocimiento a:",
-            "x": 400,
-            "y": 180,
-            "fontSize": 18,
-            "fontFamily": "Arial",
-            "color": "#333",
-            "align": "center"
-        },
-        {
-            "type": "text",
-            "content": "Juan Pérez",
-            "x": 400,
-            "y": 230,
-            "fontSize": 24,
-            "fontFamily": "Arial",
-            "fontWeight": "bold",
-            "color": "#0056b3",
-            "align": "center"
-        },
-        {
-            "type": "text",
-            "content": "Por su destacada participación en el curso de Programación",
-            "x": 400,
-            "y": 280,
-            "fontSize": 16,
-            "fontFamily": "Arial",
-            "color": "#333",
-            "align": "center"
-        },
-        {
-            "type": "text",
-            "content": "Fecha de emisión: 02/03/2025",
-            "x": 400,
-            "y": 350,
-            "fontSize": 14,
-            "fontFamily": "Arial",
-            "color": "#666",
-            "align": "center"
-        },
-        {
-            "type": "image",
-            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Signature_Blank.png/800px-Signature_Blank.png",
-            "x": 550,
-            "y": 450,
-            "width": 120,
-            "height": 60
-        },
-        {
-            "type": "image",
-            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Seal_of_the_United_States_Department_of_Justice.svg/1024px-Seal_of_the_United_States_Department_of_Justice.svg.png",
-            "x": 600,
-            "y": 500,
-            "width": 100,
-            "height": 100
-        },
-        {
-            "type": "border",
-            "style": "solid",
-            "color": "#000",
-            "thickness": 5
+      "width": 1139,
+      "height": 857,
+      "orientation": "horizontal",
+      "sizePreset": "custom",
+      "background": {
+        "type": "solid",
+        "color": "#F5F1E9",
+        "image": {
+          "src": "",
+          "opacity": 0.2,
+          "fit": "cover"
         }
+      },
+      "border": {
+        "type": "double",
+        "color": "#0A2D6D",
+        "width": 10,
+        "radius": 0
+      }
+    },
+    "text": [
+      {
+        "content": "UNIVERSIDAD DE EL SALVADOR",
+        "font": {
+          "family": "Arial",
+          "size": 14,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 100
+        },
+        "alignment": "center"
+      },
+      {
+        "content": "FACULTAD DE INGENIERÍA Y ARQUITECTURA",
+        "font": {
+          "family": "Arial",
+          "size": 14,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 120
+        },
+        "alignment": "center"
+      },
+      {
+        "content": "ESCUELA DE POSGRADO",
+        "font": {
+          "family": "Arial",
+          "size": 14,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 140
+        },
+        "alignment": "center"
+      },
+      {
+        "content": "CENTRO DE INVESTIGACIONES Y APLICACIONES NUCLEARES",
+        "font": {
+          "family": "Arial",
+          "size": 14,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 160
+        },
+        "alignment": "center"
+      },      
+      {
+        "content": "{{NOMBRES}} {{APELLIDOS}}",
+        "font": {
+          "family": "Arial",
+          "size": 18,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 300
+        },
+        "alignment": "center",
+        "placeholder": true
+      },
+      {
+        "content": "Curso sobre Protección Radiológica Ocupacional, Edición II 2024",
+        "font": {
+          "family": "Arial",
+          "size": 14,
+          "weight": "bold",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 370
+        },
+        "alignment": "center"
+      },
+      {
+        "content": "Ha dado cumplimiento a todos los requisitos del “Curso sobre Protección Radiológica Ocupacional, Edición II 2024”, aprobado según acuerdo del CSU N°028-2023-2025 (VIII-3.2), de fecha 18 de julio de 2024. El curso tuvo una duración de 60 horas de clase y fue desarrollado en Modalidad en Línea.",
+        "font": {
+          "family": "Arial",
+          "size": 12,
+          "weight": "normal",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 400
+        },
+        "alignment": "center"
+      },
+      {
+        "content": "Por tanto, se extiende el presente diploma...",
+        "font": {
+          "family": "Arial",
+          "size": 12,
+          "weight": "normal",
+          "color": "#000000"
+        },
+        "position": {
+          "x": 570,
+          "y": 470
+        },
+        "alignment": "center"
+      }
+    ],
+    "lines": [
+      {
+        "start": { "x": 200, "y": 650 },
+        "end": { "x": 400, "y": 650 },
+        "color": "#000000",
+        "width": 2,
+        "angle": 0
+      },
+      {
+        "start": { "x": 500, "y": 650 },
+        "end": { "x": 700, "y": 650 },
+        "color": "#000000",
+        "width": 2,
+        "angle": 0
+      },
+      {
+        "start": { "x": 800, "y": 650 },
+        "end": { "x": 1000, "y": 650 },
+        "color": "#000000",
+        "width": 2,
+        "angle": 0
+      }
+    ],
+    "images": [
+      {
+        "src": "images/1.png",
+        "position": { "x": 100, "y": 50 },
+        "size": { "width": 100, "height": 100 },
+        "rotation": 0,
+        "scale": 1
+      },
+      {
+        "src": "images/1.png",
+        "position": { "x": 570, "y": 180 },
+        "size": { "width": 100, "height": 100 },
+        "rotation": 0,
+        "scale": 1
+      },
+      {
+        "src": "images/1.png",
+        "position": { "x": 970, "y": 50 },
+        "size": { "width": 100, "height": 100 },
+        "rotation": 0,
+        "scale": 1
+      },
+      {
+        "src": "images/1.png",
+        "position": { "x": 950, "y": 300 },
+        "size": { "width": 100, "height": 100 },
+        "rotation": 0,
+        "scale": 1
+      }
     ]
-}
+  }

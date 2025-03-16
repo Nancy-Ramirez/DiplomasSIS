@@ -1,33 +1,355 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CDN -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CDN -->
     <link rel="stylesheet" href="../../../styles.css" />
     <title>Editor de Diplomas</title>
-</head>
-<body class="flex h-screen bg-gray-100">
-
+  </head>
+  <body class="flex h-screen bg-gray-100">
     <!-- Sidebar -->
-    <div class="w-1/4 bg-white p-5 shadow-lg">
-        <h2 class="text-xl font-bold mb-4">Editor de Diploma</h2>
+    <div class="w-1/4 bg-white p-5 shadow-lg overflow-y-auto h-screen">
+      <h2 class="text-lg font-bold mb-4">Editor de Diploma</h2>
 
-        <!-- Campos para editar -->
-        <div id="editor">
-            <!-- Los inputs se llenarán dinámicamente con JS -->
+      <!-- Campos para editar -->
+      <div id="editor">
+        <!-- Editar Diploma -->
+        <h3 class="font-bold mb-2 cursor-pointer text-sm" onclick="toggleSection('diplomaSection')">Diploma</h3>
+        <div id="diplomaSection" class="hidden">
+          <h4 class="text-center text-md">Tamaño y Orientación</h4>
+        <hr>
+          <!-- Orientación -->
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Orientación:</label>
+            <select id="orientation" class="flex-1 p-1 border rounded text-sm" onchange="updateOrientation()">
+              <option value="horizontal">Horizontal</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+          <!-- Tamaño -->
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Tamaño:</label>
+            <select id="sizePreset" class="flex-1 p-1 border rounded text-sm" onchange="updateSizePreset()">
+              <option value="carta">Carta (216 x 279 mm)</option>
+              <option value="oficio">Oficio (216 x 356 mm)</option>
+              <option value="a4">A4 (210 x 297 mm)</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <!-- Tamaño personalizado -->
+          <div id="customSize" class="hidden">
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Ancho (px):</label>
+              <input
+                type="number"
+                id="customWidth"
+                min="100"
+                max="2000"
+                value="600"
+                class="flex-1 p-1 border rounded w-24 text-sm"
+                onchange="updateCustomSize()"
+              />
+            </div>
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Alto (px):</label>
+              <input
+                type="number"
+                id="customHeight"
+                min="100"
+                max="2000"
+                value="400"
+                class="flex-1 p-1 border rounded w-24 text-sm"
+                onchange="updateCustomSize()"
+              />
+            </div>
+          </div>
+          
+          <h4 class="mt-4 text-center text-md">Fondo</h4>
+          <hr>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Color de fondo:</label>
+            <input
+              type="color"
+              id="bgColor"
+              class="flex-1 h-10 p-1 border rounded"
+              value="#ffffff"
+              onchange="updateBackgroundColor()"
+            />
+          </div>
+          <div class="pt-2">
+            <label class="w-32 text-sm">Imagen de fondo:</label>
+            <input
+              type="file"
+              id="bgImageUpload"
+              accept="image/*"
+              class="flex-1 p-1 pt-2 pb-2 border rounded text-sm"
+              onchange="updateBackgroundImage(event)"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Opacidad de imagen:</label>
+            <input
+              type="range"
+              id="bgOpacity"
+              min="0"
+              max="1"
+              step="0.1"
+              value="1"
+              class="flex-1"
+              onchange="updateBackgroundOpacity()"
+            />
+          </div>
+          <div class="items-center pt-2">
+            <button onclick="removeBackgroundImage()" class="bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Quitar Imagen de Fondo</button>
+          </div>
+          
+          <h4 class="mt-4 text-center text-md">Bordes</h4>
+          <hr>
+          <div id="borderOptions" class="hidden">
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Color del borde:</label>
+              <input
+                type="color"
+                id="borderColor"
+                class="flex-1 h-10 p-1 border rounded"
+                value="#000000"
+                onchange="updateBorderColor()"
+              />
+            </div>
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Grosor del borde:</label>
+              <input
+                type="number"
+                id="borderWidth"
+                min="0"
+                max="20"
+                value="1"
+                class="flex-1 p-1 border rounded text-sm"
+                onchange="updateBorderWidth()"
+              />
+            </div>
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Tipo de línea:</label>
+              <select id="borderType" class="flex-1 p-1 border rounded text-sm" onchange="updateBorderType()">
+                <option value="solid">Sólido</option>
+                <option value="dotted">Punteado</option>
+                <option value="dashed">Discontinuo</option>
+              </select>
+            </div>
+            <div class="flex items-center space-x-4 pt-2">
+              <label class="w-32 text-sm">Esquinas redondeadas:</label>
+              <input
+                type="number"
+                id="borderRadius"
+                min="0"
+                max="50"
+                value="0"
+                class="flex-1 p-1 border rounded text-sm"
+                onchange="updateBorderRadius()"
+              />
+            </div>
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <button onclick="addBorder()" class="flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600 text-sm">Agregar Borde</button>
+            <button onclick="deleteBorder()" class="flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Eliminar Borde</button>
+          </div>
         </div>
 
-        <button id="descargar" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-            Descargar Diploma
-        </button>
+        <!-- Editar Texto -->
+        <h3 class="font-bold mb-2 mt-4 cursor-pointer text-sm" onclick="toggleSection('textSection')">Texto</h3>
+        <div id="textSection" class="hidden">
+          <button onclick="addText()" class="w-full bg-green-500 text-white py-1 rounded mb-2 hover:bg-green-600 text-sm">Agregar Texto</button>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Contenido:</label>
+            <input
+              type="text"
+              id="inputTexto"
+              class="flex-1 p-1 border rounded text-sm"
+              placeholder="Texto del diploma"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Fuente:</label>
+            <select id="selectFont" class="flex-1 p-1 border rounded text-sm">
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Color:</label>
+            <input
+              type="color"
+              id="inputColor"
+              class="flex-1 h-10 p-1 border rounded"
+              value="#000000"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Tamaño (px):</label>
+            <input
+              type="number"
+              id="inputSize"
+              min="8"
+              max="72"
+              value="16"
+              class="flex-1 p-1 border rounded text-sm"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Grosor:</label>
+            <select id="selectWeight" class="flex-1 p-1 border rounded text-sm">
+              <option value="normal">normal</option>
+              <option value="bold">bold</option>
+              <option value="lighter">lighter</option>
+              <option value="bolder">bolder</option>
+            </select>
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Alineación:</label>
+            <select id="selectAlign" class="flex-1 p-1 border rounded text-sm">
+              <option value="left">left</option>
+              <option value="center">center</option>
+              <option value="right">right</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Editar Imágenes -->
+        <h3 class="font-bold mb-2 mt-4 cursor-pointer text-sm" onclick="toggleSection('imageSection')">Imágenes</h3>
+        <div id="imageSection" class="hidden">
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Subir imagen:</label>
+            <input
+              type="file"
+              id="imageUpload"
+              accept="image/*"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="addImageFromFile(event)"
+            />
+          </div>
+          <h4 class="mt-4 text-sm">Opciones de Imagen Seleccionada</h4>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Rotar (grados):</label>
+            <input
+              type="number"
+              id="rotateImage"
+              min="0"
+              max="360"
+              value="0"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="rotateSelectedImage()"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Escala (%):</label>
+            <input
+              type="number"
+              id="scaleImage"
+              min="10"
+              max="200"
+              value="100"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="scaleSelectedImage()"
+            />
+          </div>
+          <button onclick="deleteSelectedImage()" class="w-full bg-red-500 text-white py-1 rounded mt-2 hover:bg-red-600 text-sm">
+            Eliminar Imagen Seleccionada
+          </button>
+        </div>
+
+        <!-- Editar Línea -->
+        <h3 class="font-bold mb-2 mt-4 cursor-pointer text-sm" onclick="toggleSection('lineSection')">Editar Línea</h3>
+        <div id="lineSection" class="hidden">
+          <button onclick="addLine()" class="w-full bg-green-500 text-white py-1 rounded mb-2 hover:bg-green-600 text-sm">Agregar Línea</button>
+          <h4 class="mt-4 text-sm">Opciones de Línea Seleccionada</h4>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Color de línea:</label>
+            <input
+              type="color"
+              id="inputLineColor"
+              class="flex-1 h-10 p-1 border rounded"
+              value="#000000"
+              onchange="changeLineColor()"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Grosor (px):</label>
+            <input
+              type="number"
+              id="lineWidth"
+              min="1"
+              max="50"
+              value="5"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="changeLineWidth()"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Inclinación (grados):</label>
+            <input
+              type="number"
+              id="lineAngle"
+              min="0"
+              max="360"
+              value="0"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="changeLineAngle()"
+            />
+          </div>
+          <div class="flex items-center space-x-4 pt-2">
+            <label class="w-32 text-sm">Largo (px):</label>
+            <input
+              type="number"
+              id="lineLength"
+              min="10"
+              max="800"
+              value="100"
+              class="flex-1 p-1 border rounded text-sm"
+              onchange="changeLineLength()"
+            />
+          </div>
+          <button onclick="deleteSelectedLine()" class="w-full bg-red-500 text-white py-1 rounded mt-2 hover:bg-red-600 text-sm">
+            Eliminar Línea Seleccionada
+          </button>
+        </div>
+      </div>
+
+      <button
+        id="descargar"
+        class="mt-4 w-full bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700 text-sm"
+      >
+        Guardar Cambios
+      </button>
     </div>
 
     <!-- Área de Canvas -->
     <div class="flex-1 flex items-center justify-center">
-        <canvas id="diplomaCanvas" width="600" height="400" class="bg-white shadow-lg"></canvas>
+      <canvas
+        id="diplomaCanvas"
+        width="600"
+        height="400"
+        class="bg-white shadow-lg"
+      ></canvas>
     </div>
 
+    <script>
+      function toggleSection(sectionId) {
+        const sections = ['diplomaSection', 'textSection', 'imageSection', 'lineSection'];
+        sections.forEach(id => {
+          const element = document.getElementById(id);
+          if (id === sectionId) {
+            element.classList.toggle('hidden');
+          } else {
+            element.classList.add('hidden');
+          }
+        });
+      }
+    </script>
     <script src="../../js/diplomas/editar-diplomas.js"></script>
-</body>
+  </body>
 </html>
