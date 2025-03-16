@@ -1,12 +1,41 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, screen, globalShortcut } = require('electron');
 const { exec, spawn } = require('child_process');
 const path = require('path');
 
 let mainWindow;
 let flaskProcess;
 
+// Función para ajustar la ventana al área de trabajo (pantalla completa con barra de tareas visible)
+function adjustWindowToWorkArea() {
+    const display = screen.getPrimaryDisplay();
+    const { workArea, bounds } = display;
+
+    // Ajustar la ventana al área de trabajo (excluye la barra de tareas)
+    mainWindow.setBounds({
+        x: workArea.x,
+        y: workArea.y,
+        width: workArea.width,
+        height: workArea.height
+    });
+
+    // Asegurarse de que no esté en modo pantalla completa real
+    mainWindow.setFullScreen(false);
+
+    console.log(`Ventana ajustada al área de trabajo: ${workArea.width}x${workArea.height} en (${workArea.x}, ${workArea.y})`);
+}
+
+// Función para alternar entre modo "pantalla completa con barra de tareas" y pantalla completa real
+function toggleFullScreenMode() {
+    if (mainWindow.isFullScreen()) {
+        // Salir de pantalla completa y ajustar al área de trabajo
+        adjustWindowToWorkArea();
+    } else {
+        // Entrar en pantalla completa real (oculta la barra de tareas)
+        mainWindow.setFullScreen(true);
+    }
+}
+
 app.whenReady().then(() => {
-    
     // 📌 Ruta absoluta al backend
     const backendPath = path.join(__dirname, 'backend');
 
@@ -25,20 +54,44 @@ app.whenReady().then(() => {
     });
 
     flaskProcess.on('close', (code) => {
-        console.log(`El proceso Flask termino con codigo ${code}`);
+        console.log(`El proceso Flask terminó con código ${code}`);
     });
-    
 
     // Crear la ventana de Electron para el frontend
     mainWindow = new BrowserWindow({
-        width: 800,
+        width: 800,  // Tamaño inicial (se ajustará después)
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false // Nota: Habilita esto por seguridad en producción
+            nodeIntegration: false, // Deshabilitado por seguridad
+            contextIsolation: true, // Habilitado para aislar el renderer
+            preload: path.join(__dirname, 'preload.js') // Script de precarga
+        },
+        frame: true, // Mantener el marco de la ventana
+        autoHideMenuBar: true // Ocultar la barra de menú por defecto
+    });
+
+    // Ajustar la ventana al área de trabajo al iniciar
+    adjustWindowToWorkArea();
+
+    // Permitir redimensionamiento (opcional, puedes cambiar a false si no lo deseas)
+    mainWindow.setResizable(true);
+
+    // Evitar que maximizar cubra la barra de tareas
+    mainWindow.on('maximize', () => {
+        adjustWindowToWorkArea();
+    });
+
+    // Ajustar la ventana si el área de trabajo cambia (por ejemplo, si la barra de tareas se oculta/muestra)
+    screen.on('display-metrics-changed', () => {
+        if (!mainWindow.isFullScreen()) {
+            adjustWindowToWorkArea();
         }
     });
 
+    // Registrar atajo para alternar modos (F11)
+    globalShortcut.register('F11', toggleFullScreenMode);
+
+    // Cargar el archivo HTML
     mainWindow.loadFile(path.join(__dirname, 'inicio.html'))
         .then(() => {
             console.log('✅ Frontend cargado desde inicio.html');
@@ -51,7 +104,6 @@ app.whenReady().then(() => {
 // 🔥 Función para cerrar procesos en el puerto 5000
 function killPortProcesses(callback) {
     if (process.platform === 'win32') {
-        // 🔹 Cerrar cualquier proceso que use el puerto 5000
         exec('netstat -ano | findstr :5000', (err, stdout) => {
             if (err) {
                 console.error(`❌ Error al buscar procesos en puerto 5000: ${err.message}`);
@@ -92,7 +144,6 @@ function killPortProcesses(callback) {
             });
         });
 
-        // 🔹 Alternativamente, matar directamente todos los procesos Python (si Flask no se cerró)
         setTimeout(() => {
             exec('taskkill /IM python.exe /F', (killErr) => {
                 if (killErr) {
@@ -102,9 +153,7 @@ function killPortProcesses(callback) {
                 }
             });
         }, 2000);
-
     } else {
-        // 🔹 En sistemas Unix (Linux/Mac)
         exec('lsof -ti :5000 | xargs kill -9', (err) => {
             if (err) {
                 console.error(`❌ Error al cerrar procesos en puerto 5000: ${err.message}`);
@@ -122,16 +171,14 @@ app.on('window-all-closed', () => {
         console.log("🔴 Intentando cerrar Flask de forma ordenada...");
         flaskProcess.kill('SIGTERM');
 
-        // 🔹 Esperar 1 segundo para ver si Flask cierra correctamente
         setTimeout(() => {
             if (!flaskProcess.killed) {
-                console.log("⚠️ Flask no cerro, forzando terminación...");
+                console.log("⚠️ Flask no cerró, forzando terminación...");
                 flaskProcess.kill('SIGKILL');
             }
         }, 1000);
     }
 
-    // 🔥 Matar procesos en el puerto 5000
     console.log("🔍 Buscando y cerrando procesos en el puerto 5000...");
     killPortProcesses((err) => {
         if (err) {
@@ -145,5 +192,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('quit', () => {
-    console.log('🛑 Aplicacion cerrada completamente.');
+    // Limpiar atajos de teclado al cerrar
+    globalShortcut.unregisterAll();
+    console.log('🛑 Aplicación cerrada completamente.');
 });
