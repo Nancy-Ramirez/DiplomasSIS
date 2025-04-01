@@ -2,3 +2,5 @@
 /node_modules
 /backend/mensajes_recibidos
 /backend/uploads
+/backend/diplomas
+/backend/json_data
