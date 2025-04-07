@@ -4,31 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <!-- CDN Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Gestionar Cartas</title>
     <link rel="stylesheet" href="../../../styles.css" />
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen bg-gray-100">
 
-    <!-- Título en la parte superior -->
-    <div class="w-full h-1/6 flex items-center justify-center bg-gray-100 shadow-md">
-        <h1 class="text-lg font-bold">Gestionar Cartas</h1>
+    <header class="text-gray-600 body-font">
+        <div
+          class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center"
+        >
+          <a
+            class="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0"
+          >
+            <img src="../../../src/images/2.png" alt="" class="w-12" />
+            <span class="ml-3 text-xl">Sistema Gestión de Documentos UES</span>
+          </a>
+          <nav
+            class="md:ml-auto flex flex-wrap items-center text-base justify-center"
+          >
+            <a
+              href="../../../inicio.html"
+              class="mr-5 hover:text-gray-900"
+              >Inicio</a
+            >
+            <a href="../../../Templates/html/cartas/cartas.html" class="mr-5 hover:text-gray-900">Cartas</a>
+            <a class="mr-5 hover:text-gray-900">Firmas</a>
+            <a class="mr-5 hover:text-gray-900">Sellos</a>
+          </nav>
+        </div>
+      </header>
+
+    <!-- Título -->
+    <div class="w-full h-16 flex items-center justify-center bg-white shadow">
+        <h1 class="text-xl font-bold text-gray-800">Gestionar Cartas</h1>
     </div>
 
-    <!-- Contenedor con dos columnas -->
-    <div class="flex flex-1">
-        <!-- Columna izquierda - Configuraciones -->
-        <div class="w-1/2 p-8">
-            <h2 class="text-xl font-bold text-center text-gray-800 mb-6">
-                Configuraciones Carta
-            </h2>
+    <!-- Contenedor principal -->
+    <div class="flex flex-col md:flex-row gap-10 px-10 py-10">
+
+        <!-- Columna izquierda - Configuración de la carta -->
+        <div class="w-full md:w-6/12 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-center mb-6 text-gray-800">Configuraciones Carta</h2>
             <div class="space-y-6">
-                
-                <!-- Selección de Tipo de Letra -->
-                <div class="flex items-center space-x-4">
-                    <label for="letra" class="w-1/4 text-sm font-medium text-gray-700">Tipo de Letra</label>
-                    <select id="letra" name="letra" required 
-                        class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+
+                <!-- Tipo de Letra -->
+                <div class="flex items-start gap-4">
+                    <label for="letra" class="w-1/3 text-sm font-medium text-gray-700">Tipo de Letra</label>
+                    <select id="letra" class="w-2/3 px-4 py-2 border rounded-md shadow-sm">
                         <option value="">-- Selecciona --</option>
                         <option value="Arial">Arial</option>
                         <option value="Times New Roman">Times New Roman</option>
@@ -38,11 +61,10 @@
                     </select>
                 </div>
 
-                <!-- Selección de Tamaño de Letra -->
-                <div class="flex items-center space-x-4">
-                    <label for="tamaño-letra" class="w-1/4 text-sm font-medium text-gray-700">Tamaño de Letra</label>
-                    <select id="tamaño-letra" name="tamaño-letra" required 
-                        class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+                <!-- Tamaño de Letra -->
+                <div class="flex items-start gap-4">
+                    <label for="tamaño-letra" class="w-1/3 text-sm font-medium text-gray-700">Tamaño de Letra</label>
+                    <select id="tamaño-letra" class="w-2/3 px-4 py-2 border rounded-md shadow-sm">
                         <option value="">-- Selecciona --</option>
                         <option value="12">12</option>
                         <option value="14">14</option>
@@ -51,9 +73,11 @@
                         <option value="20">20</option>
                     </select>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <label for="tamaño-papel" class="w-1/4 text-sm font-medium text-gray-700">Tamaño de Papel</label>
-                    <select name="tamaño-papel" id="tamaño-papel" required class="w-3/4 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+
+                <!-- Tamaño de Papel -->
+                <div class="flex items-start gap-4">
+                    <label for="tamaño-papel" class="w-1/3 text-sm font-medium text-gray-700">Tamaño de Papel</label>
+                    <select id="tamaño-papel" class="w-2/3 px-4 py-2 border rounded-md shadow-sm">
                         <option value="">--Selecciona--</option>
                         <option value="Carta">Carta</option>
                         <option value="Oficio">Oficio</option>
@@ -62,148 +86,118 @@
                     </select>
                 </div>
 
-                <div class="flex items-center space-x-4">
-                    <label class="w-1/4 text-sm font-medium text-gray-700">Alineación</label>
                 
-                    <div class="flex space-x-2">
-                        <!-- Alinear Izquierda -->
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="alineacion" value="left" id="left" class="sr-only peer">
-                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
-                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
-                                <img src="../../../src/images/izquierda.png" alt="Alinear Izquierda" class="w-6 h-6" />
-                            </div>
-                        </label>
-                
-                        <!-- Centrar -->
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="alineacion" value="center" id="center" class="sr-only peer">
-                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
-                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
-                                <img src="../../../src/images/centro.png" alt="Centrar texto" class="w-6 h-6" />
-                            </div>
-                        </label>
-                
-                        <!-- Alinear Derecha -->
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="alineacion" value="right" id="right" class="sr-only peer">
-                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
-                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
-                                <img src="../../../src/images/derecha.png" alt="Alinear Derecha" class="w-6 h-6" />
-                            </div>
-                        </label>
-                
-                        <!-- Justificar -->
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="alineacion" value="justify" id="justify" class="sr-only peer">
-                            <div class="w-10 h-10 flex justify-center items-center bg-gray-100 rounded hover:bg-gray-300 
-                                peer-checked:ring-2 peer-checked:ring-blue-500 transition-all">
-                                <img src="../../../src/images/justificado.png" alt="Justificar texto" class="w-6 h-6" />
-                            </div>
-                        </label>
+<!-- Alineación combinada (íconos + texto) -->
+<div class="flex flex-col gap-2">
+    <span class="text-sm font-medium text-gray-700">Alineación</span>
+    <div class="flex gap-4">
+        <!-- Izquierda -->
+        <label class="flex flex-col items-center cursor-pointer">
+            <input type="radio" name="alineacion" value="left" class="sr-only peer">
+            <div class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 ring-offset-2 peer-checked:ring-2 peer-checked:ring-blue-500 transition">
+                <img src="../../../src/images/izquierda.png" alt="Izquierda" class="w-5 h-5" />
+            </div>
+            <span class="text-xs mt-1 text-gray-600">Izquierda</span>
+        </label>
+
+        <!-- Centrado -->
+        <label class="flex flex-col items-center cursor-pointer">
+            <input type="radio" name="alineacion" value="center" class="sr-only peer">
+            <div class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 ring-offset-2 peer-checked:ring-2 peer-checked:ring-blue-500 transition">
+                <img src="../../../src/images/centro.png" alt="Centrado" class="w-5 h-5" />
+            </div>
+            <span class="text-xs mt-1 text-gray-600">Centrado</span>
+        </label>
+
+        <!-- Derecha -->
+        <label class="flex flex-col items-center cursor-pointer">
+            <input type="radio" name="alineacion" value="right" class="sr-only peer">
+            <div class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 ring-offset-2 peer-checked:ring-2 peer-checked:ring-blue-500 transition">
+                <img src="../../../src/images/derecha.png" alt="Derecha" class="w-5 h-5" />
+            </div>
+            <span class="text-xs mt-1 text-gray-600">Derecha</span>
+        </label>
+
+        <!-- Justificado -->
+        <label class="flex flex-col items-center cursor-pointer">
+            <input type="radio" name="alineacion" value="justify" class="sr-only peer">
+            <div class="w-10 h-10 flex items-center justify-center bg-gray-100 rounded hover:bg-gray-200 ring-offset-2 peer-checked:ring-2 peer-checked:ring-blue-500 transition">
+                <img src="../../../src/images/justificado.png" alt="Justificado" class="w-5 h-5" />
+            </div>
+            <span class="text-xs mt-1 text-gray-600">Justificado</span>
+        </label>
+    </div>
+</div>
+
+
+                <!-- Tipo de Carta -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm font-medium text-gray-700">Tipo de Carta</span>
+                    <div class="flex gap-4">
+                        <label><input type="radio" name="tipoCarta" value="individual" class="mr-1"> Individual</label>
+                        <label><input type="radio" name="tipoCarta" value="masiva" class="mr-1"> Masiva</label>
                     </div>
                 </div>
 
-                <!-- Selección de Tipo de Carta -->
-                <div class="flex items-center space-x-4 mt-4">
-                    <label class="w-1/4 text-sm font-medium text-gray-700">Tipo de Carta</label>
-                    <div class="flex space-x-4">
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="tipoCarta" value="individual" class="form-radio text-blue-500">
-                            <span class="ml-2 text-gray-700">Individual</span>
-                        </label>
-                        <label class="inline-flex items-center">
-                            <input type="radio" name="tipoCarta" value="masiva" class="form-radio text-blue-500">
-                            <span class="ml-2 text-gray-700">Masiva</span>
-                        </label>
+                <!-- Carga Masiva -->
+                <div id="cargaMasivaContainer" class="hidden flex flex-col gap-2">
+                    <label class="text-sm font-medium text-gray-700">Archivo de destinatarios</label>
+                    <div class="flex items-center gap-4 bg-white p-2 rounded-md shadow">
+                        <input type="file" id="archivoMasivo" accept=".xlsx,.csv" class="hidden" />
+                        <button id="botonArchivoMasivo" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400 transition">Seleccionar archivo</button>
+                        <span id="nombreArchivoMasivo" class="text-gray-600">Ningún archivo seleccionado</span>
                     </div>
                 </div>
-
-                <!-- Contenedor de carga masiva oculto por defecto -->
-            <div id="cargaMasivaContainer" class="hidden mt-4 space-y-2">
-                <label class="block text-sm font-medium text-gray-700">Archivo de destinatarios</label>
-                <div class="flex items-center space-x-2 bg-white p-2 rounded-md shadow">
-                    <input type="file" id="archivoMasivo" accept=".xlsx,.csv" class="hidden" />
-                    <button id="botonArchivoMasivo" class="bg-gray-300 px-3 py-1 rounded-md cursor-pointer 
-                        hover:bg-gray-400 hover:shadow-lg transition-all active:scale-95">
-                        Seleccionar archivo
-                    </button>
-                    <span id="nombreArchivoMasivo" class="text-gray-600">Ningún archivo seleccionado</span>
-                </div>
-            </div>
             </div>
         </div>
 
-        <div class="w-1/2 p-8">
-         <!-- Membrete (Subir Archivo - Imagen) -->
-         <div>
-            <label class="block text-gray-700">Membrete (Imagen)</label>
-            <div class="flex items-center space-x-2 bg-white p-2 rounded-md shadow">
-                <input type="file" id="membrete" accept="image/png, image/jpeg" class="hidden">
-                <!-- Botón con animaciones y efectos -->
-                <button id="fileButton" class="bg-gray-300 px-3 py-1 rounded-md cursor-pointer 
-                    hover:bg-gray-400 hover:shadow-lg transition-all active:scale-95">
-                    Seleccionar imagen
-                </button>
-                <span id="fileName" class="text-gray-600">Ningún archivo seleccionado</span>
-            </div>
-        </div>
+        <!-- Columna derecha - Contenido de la carta -->
+        <div class="w-full md:w-6/12 bg-white p-8 rounded-lg shadow-md space-y-6">
 
-        <div class="mt-2">
-            <img id="previewImage" class="hidden w-full h-40 object-contain rounded-md shadow">
-        </div>
-
-        <div>
-            <label class="block text-gray-700">Asunto</label>
-            <div class="flex items-center bg-white p-2 rounded-md shadow">
-                <input id="asunto" class="w-full outline-none bg-white">
-            </div>
-
-        </div>
-
-        <div>
-            <label class="block text-gray-700">Fecha</label>
-            <div class="flex items-center bg-white p-2 rounded-md shadow">
-                <input type="date" id="fecha" class="w-full outline-none">
-            </div>
-        </div>
-        <!-- Destinatario -->
-        <div>
-            <label class="block text-gray-700">Destinatario</label>
-            <textarea id="destinatario" class="w-full p-2 rounded-md shadow resize-none bg-white"></textarea>
-        </div>
-        <!-- Cuerpo -->
-        <div>
-            <label class="block text-gray-700">Cuerpo</label>
-            <textarea id="cuerpo" class="w-full p-2 rounded-md shadow resize-none bg-white"></textarea>
-        </div>
-
-        <!-- Contenedor de Firmantes -->
-        <div class="grid grid-cols-2 gap-4 items-start">
-            <!-- Columna Izquierda (Nombres de Firmantes) -->
-            <div class="flex flex-col items-center">
-                <label class="block text-gray-700">Cantidad de Firmantes (1-4)</label>
-                <input type="number" id="cantidadFirmantes" min="1" max="4"
-                    class="w-20 p-2 rounded-md shadow text-center mt-2 bg-white">
-            </div>
-
-
-            <!-- Columna Derecha (Cantidad de Firmantes) -->
             <div>
-                <label class="block text-gray-700">Nombre de Firmantes</label>
-                <div id="firmantesContainer" class="space-y-2">
-                    <!-- Aquí se agregarán dinámicamente los inputs -->
+                <label class="block text-sm font-medium text-gray-700">Membrete (Imagen)</label>
+                <div class="flex items-center gap-4">
+                    <input type="file" id="membrete" accept="image/png, image/jpeg" class="hidden">
+                    <button id="fileButton" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400 transition">Seleccionar imagen</button>
+                    <span id="fileName" class="text-gray-600">Ningún archivo seleccionado</span>
+                </div>
+                <img id="previewImage" class="hidden w-full h-40 object-contain mt-2 rounded-md shadow">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Asunto</label>
+                <input id="asunto" class="w-full px-3 py-2 border rounded-md shadow-sm" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Fecha</label>
+                <input type="date" id="fecha" class="w-full px-3 py-2 border rounded-md shadow-sm" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Destinatario</label>
+                <textarea id="destinatario" rows="2" class="w-full px-3 py-2 border rounded-md shadow-sm resize-none"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Cuerpo</label>
+                <textarea id="cuerpo" rows="4" class="w-full px-3 py-2 border rounded-md shadow-sm resize-none"></textarea>
+            </div>
+
+            <!-- Firmantes -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col items-start">
+                    <label class="text-sm font-medium text-gray-700">Cantidad de Firmantes (1-4)</label>
+                    <input type="number" id="cantidadFirmantes" min="1" max="4" class="mt-1 w-20 px-3 py-2 border rounded-md shadow-sm text-center" />
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700">Nombre de Firmantes</label>
+                    <div id="firmantesContainer" class="space-y-2 mt-1"></div>
                 </div>
             </div>
+
+            <button id="enviar" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition">Enviar</button>
         </div>
-
-        <button id="enviar" class="w-full bg-blue-500 text-white py-2 rounded-md shadow 
-        hover:bg-blue-600 hover:shadow-lg transition-all active:scale-95 mt-6">
-        Enviar
-        </button>
-
-    <p id="responseMessage" class="text-center text-gray-700"></p>
-
     </div>
 
     <script src="../../js/cartas/renderer.js"></script>

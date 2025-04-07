@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const cantidadFirmantes = document.getElementById("cantidadFirmantes");
     const firmantesContainer = document.getElementById("firmantesContainer");
     const sendButton = document.getElementById("enviar");
-    const responseMessage = document.getElementById("responseMessage");
 
     const letra = document.getElementById("letra");
     const tamañoLetra = document.getElementById("tamaño-letra");
@@ -21,9 +20,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const botonArchivoMasivo = document.getElementById("botonArchivoMasivo");
     const nombreArchivoMasivo = document.getElementById("nombreArchivoMasivo");
 
-    fileButton.addEventListener("click", () => {
-        fileInput.click();
+    function marcarCampoInvalido(campo) {
+        campo.classList.add("border-red-500", "ring-2", "ring-red-300");
+    }
+
+    function limpiarCampoInvalido(campo) {
+        campo.classList.remove("border-red-500", "ring-2", "ring-red-300");
+    }
+
+    function agregarEventoLimpieza(campo) {
+        campo.addEventListener("input", () => limpiarCampoInvalido(campo));
+    }
+
+    function agregarEventoCambio(campo) {
+        campo.addEventListener("change", () => limpiarCampoInvalido(campo));
+    }
+
+    [letra, tamañoLetra, tamañoPapel, fecha, asunto, cuerpo, destinatarioInput, cantidadFirmantes].forEach(campo => {
+        agregarEventoCambio(campo);
+        agregarEventoLimpieza(campo);
     });
+
+    fileButton.addEventListener("click", () => fileInput.click());
 
     fileInput.addEventListener("change", () => {
         fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "Ningún archivo seleccionado";
@@ -45,9 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    botonArchivoMasivo.addEventListener("click", () => {
-        archivoMasivo.click();
-    });
+    botonArchivoMasivo.addEventListener("click", () => archivoMasivo.click());
 
     archivoMasivo.addEventListener("change", () => {
         if (archivoMasivo.files.length > 0) {
@@ -65,13 +81,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     cantidadFirmantes.addEventListener("input", () => {
         const numFirmantes = parseInt(cantidadFirmantes.value);
-        if (isNaN(numFirmantes) || numFirmantes < 1 || numFirmantes > 4) {
-            cantidadFirmantes.value = "";
-            firmantesContainer.innerHTML = "";
-            return;
-        }
-
         firmantesContainer.innerHTML = "";
+        if (isNaN(numFirmantes) || numFirmantes < 1 || numFirmantes > 4) return;
+
         for (let i = 1; i <= numFirmantes; i++) {
             const inputDiv = document.createElement("div");
             inputDiv.classList.add("flex", "items-center", "space-x-2");
@@ -85,6 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
             input.id = `firmante${i}`;
             input.classList.add("w-2/3", "p-2", "rounded-md", "shadow");
 
+            input.addEventListener("input", () => limpiarCampoInvalido(input));
+
             inputDiv.appendChild(label);
             inputDiv.appendChild(input);
             firmantesContainer.appendChild(inputDiv);
@@ -93,15 +107,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sendButton.addEventListener("click", async () => {
         const numFirmantes = parseInt(cantidadFirmantes.value);
+        let camposInvalidos = [];
+
         if (isNaN(numFirmantes) || numFirmantes < 1 || numFirmantes > 4) {
-            alert("⚠️ Por favor, ingresa una cantidad de firmantes entre 1 y 4.");
-            return;
+            marcarCampoInvalido(cantidadFirmantes);
+            camposInvalidos.push("Cantidad de firmantes (1-4)");
+        } else {
+            limpiarCampoInvalido(cantidadFirmantes);
         }
 
         let firmantes = [];
         for (let i = 1; i <= numFirmantes; i++) {
-            const firmanteInput = document.getElementById(`firmante${i}`);
-            firmantes.push(firmanteInput.value);
+            const input = document.getElementById(`firmante${i}`);
+            if (!input.value.trim()) {
+                marcarCampoInvalido(input);
+                camposInvalidos.push(`Firmante ${i}`);
+            } else {
+                limpiarCampoInvalido(input);
+                firmantes.push(input.value.trim());
+            }
         }
 
         let alineacionSeleccionada = "";
@@ -118,9 +142,35 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        if (!tipoCartaSeleccionada) {
-            alert("Por favor, selecciona si la carta es individual o masiva.");
-            return;
+        if (!letra.value) { marcarCampoInvalido(letra); camposInvalidos.push("Tipo de letra"); } else limpiarCampoInvalido(letra);
+        if (!tamañoLetra.value) { marcarCampoInvalido(tamañoLetra); camposInvalidos.push("Tamaño de letra"); } else limpiarCampoInvalido(tamañoLetra);
+        if (!tamañoPapel.value) { marcarCampoInvalido(tamañoPapel); camposInvalidos.push("Tamaño de papel"); } else limpiarCampoInvalido(tamañoPapel);
+        if (!alineacionSeleccionada) camposInvalidos.push("Alineación");
+        if (!fecha.value) { marcarCampoInvalido(fecha); camposInvalidos.push("Fecha"); } else limpiarCampoInvalido(fecha);
+        if (!asunto.value.trim()) { marcarCampoInvalido(asunto); camposInvalidos.push("Asunto"); } else limpiarCampoInvalido(asunto);
+        if (!cuerpo.value.trim()) { marcarCampoInvalido(cuerpo); camposInvalidos.push("Cuerpo"); } else limpiarCampoInvalido(cuerpo);
+        if (!tipoCartaSeleccionada) camposInvalidos.push("Tipo de carta");
+
+        if (tipoCartaSeleccionada === "individual") {
+            if (!destinatarioInput.value.trim()) {
+                marcarCampoInvalido(destinatarioInput);
+                camposInvalidos.push("Destinatario");
+            } else {
+                limpiarCampoInvalido(destinatarioInput);
+            }
+        }
+
+        if (tipoCartaSeleccionada === "masiva" && archivoMasivo.files.length === 0) {
+            camposInvalidos.push("Archivo de carga masiva");
+        }
+
+        if (camposInvalidos.length > 0) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Campos incompletos',
+                html: `Por favor completa: <strong>${camposInvalidos.join(", ")}</strong>`,
+                confirmButtonColor: '#f59e0b'
+            });
         }
 
         const formData = new FormData();
@@ -136,11 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (tipoCartaSeleccionada === "individual") {
             formData.append("destinatario", destinatarioInput.value);
-        } else if (tipoCartaSeleccionada === "masiva") {
-            if (archivoMasivo.files.length === 0) {
-                alert("Por favor, selecciona un archivo para carga masiva.");
-                return;
-            }
+        } else {
             formData.append("archivoMasivo", archivoMasivo.files[0]);
         }
 
@@ -158,9 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
             });
 
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`Error en la solicitud: ${response.statusText}`);
 
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
@@ -169,12 +213,48 @@ document.addEventListener("DOMContentLoaded", function () {
             a.download = tipoCartaSeleccionada === "masiva" ? "cartas_masivas.zip" : "carta_generada.docx";
             document.body.appendChild(a);
             a.click();
-            a.remove();
 
-            responseMessage.innerText = "Documento generado y descargado exitosamente.";
+            setTimeout(() => {
+                a.remove();
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Documento generado y listo para guardar.',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    limpiarFormulario();
+                });
+            }, 500);
         } catch (error) {
             console.error("Error al enviar datos:", error);
-            responseMessage.innerText = "Error al generar el documento.";
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al generar el documento.',
+                confirmButtonColor: '#ef4444'
+            });
         }
     });
+
+    function limpiarFormulario() {
+        letra.value = "";
+        tamañoLetra.value = "";
+        tamañoPapel.value = "";
+        fecha.value = "";
+        asunto.value = "";
+        cuerpo.value = "";
+        destinatarioInput.value = "";
+        cantidadFirmantes.value = "";
+        firmantesContainer.innerHTML = "";
+        tipoCartaRadios.forEach(r => r.checked = false);
+        document.querySelectorAll('input[name="alineacion"]').forEach(r => r.checked = false);
+        archivoMasivo.value = "";
+        nombreArchivoMasivo.textContent = "Ningún archivo seleccionado";
+        cargaMasivaContainer.classList.add("hidden");
+    
+        fileInput.value = "";
+        fileName.textContent = "Ningún archivo seleccionado";
+        document.getElementById("previewImage").classList.add("hidden");
+    }
+    
 });
