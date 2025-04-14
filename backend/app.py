@@ -4,6 +4,7 @@ import base64
 from io import BytesIO
 from PIL import Image
 from documento import generar_documento
+from memorandum import generar_memorandum
 import traceback
 import json
 import pandas as pd
@@ -88,7 +89,43 @@ def guardar_plantilla_api():
     return jsonify({"status": "ok", "message": "Plantilla guardada correctamente."})
     
 
-@app.route('/verificar_sirve')
-def verificar_sirve():
-    return "si sirve"
+@app.route('/crear_memorandum', methods=['POST'])
+def crear_memorandum():
+    try:
+        if not request.form:
+            return jsonify({"error": "Formato no soportado. Usa multipart/form-data"}), 415
+        
+        datos=request.form.to_dict()
+        tipo_gestion = datos.get("tipoGestion")
+
+        if tipo_gestion =="masiva":
+            archivo_masivo = request.files.get("archivoMasivo")
+            if not archivo_masivo:
+                return {"error": "Falta el archivo para carga masiva"}, 400
+            if archivo_masivo.filename.endswith(".xlsx"):
+                df = pd.read_excel(archivo_masivo)
+            elif archivo_masivo.filename.endswith(".csv"):
+                df = pd.read_csv(archivo_masivo)
+            else:
+                return {"error": "Formato de archivo no soportado"}, 400
+            
+            zip_path = os.path.join(UPLOAD_FOLDER, "memorandums.zip")
+            with ZipFile(zip_path, "w") as zipf:
+                for index, row in df.iterrows():
+                    datos_ind = datos.copy()
+                    datos_ind["para"] = row.get("Para", "N/D")
+                    datos_ind["de"] = row.get("De", "N/D")
+                    datos_ind["asunto"] = row.get("Asunto", "N/D")
+                    datos_ind["contenido"] = row.get("Contenido", "N/D")
+                    datos_ind["fecha"] = row.get("Fecha", "N/D")
+                    path = generar_memorandum(datos_ind)
+                    zipf.write(path, arcname=f"memorandum_{index+1}.docx")
+            return send_file(zip_path, as_attachment=True, download_name="memorandums.zip")
+        else:  # Individual
+            doc_path = generar_memorandum(datos)
+            return send_file(doc_path, as_attachment=True, download_name="memorandum.docx")
+    
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 

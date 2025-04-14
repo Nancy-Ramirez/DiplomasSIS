@@ -85,38 +85,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
     generarBtn.addEventListener("click", async () => {
         let camposInvalidos = [];
-
-        if (!letra.value) { marcarCampoInvalido(letra); camposInvalidos.push("Tipo de letra"); } else limpiarCampoInvalido(letra);
-        if (!tamañoLetra.value) { marcarCampoInvalido(tamañoLetra); camposInvalidos.push("Tamaño de letra"); } else limpiarCampoInvalido(tamañoLetra);
-        if (!tamañoPapel.value) { marcarCampoInvalido(tamañoPapel); camposInvalidos.push("Tamaño de papel"); } else limpiarCampoInvalido(tamañoPapel);
-        if (!fecha.value) { marcarCampoInvalido(fecha); camposInvalidos.push("Fecha"); } else limpiarCampoInvalido(fecha);
-        if (!para.value.trim()) { marcarCampoInvalido(para); camposInvalidos.push("Para"); } else limpiarCampoInvalido(para);
-        if (!de.value.trim()) { marcarCampoInvalido(de); camposInvalidos.push("De"); } else limpiarCampoInvalido(de);
-        if (!asunto.value.trim()) { marcarCampoInvalido(asunto); camposInvalidos.push("Asunto"); } else limpiarCampoInvalido(asunto);
-        if (!contenido.value.trim()) { marcarCampoInvalido(contenido); camposInvalidos.push("Contenido"); } else limpiarCampoInvalido(contenido);
-
+    
+        // Declaración de tipoGestion antes de usarla
         let tipoGestion = "";
         tipoGestionRadios.forEach(radio => {
             if (radio.checked) tipoGestion = radio.value;
         });
-
+    
+        // Validaciones
+        if (!letra.value) {
+            marcarCampoInvalido(letra);
+            camposInvalidos.push("Tipo de letra");
+        } else limpiarCampoInvalido(letra);
+    
+        if (!tamañoLetra.value) {
+            marcarCampoInvalido(tamañoLetra);
+            camposInvalidos.push("Tamaño de letra");
+        } else limpiarCampoInvalido(tamañoLetra);
+    
+        if (!tamañoPapel.value) {
+            marcarCampoInvalido(tamañoPapel);
+            camposInvalidos.push("Tamaño de papel");
+        } else limpiarCampoInvalido(tamañoPapel);
+    
+        if (!fecha.value) {
+            marcarCampoInvalido(fecha);
+            camposInvalidos.push("Fecha");
+        } else limpiarCampoInvalido(fecha);
+    
+        if (tipoGestion === "individual") {
+            if (!para.value.trim()) {
+                marcarCampoInvalido(para);
+                camposInvalidos.push("Para");
+            } else limpiarCampoInvalido(para);
+        } else {
+            limpiarCampoInvalido(para); // Por si quedó rojo
+        }
+    
+        if (!de.value.trim()) {
+            marcarCampoInvalido(de);
+            camposInvalidos.push("De");
+        } else limpiarCampoInvalido(de);
+    
+        if (!asunto.value.trim()) {
+            marcarCampoInvalido(asunto);
+            camposInvalidos.push("Asunto");
+        } else limpiarCampoInvalido(asunto);
+    
+        if (!contenido.value.trim()) {
+            marcarCampoInvalido(contenido);
+            camposInvalidos.push("Contenido");
+        } else limpiarCampoInvalido(contenido);
+    
         if (!tipoGestion) {
             camposInvalidos.push("Tipo de gestión");
         }
-
+    
         let alineacion = "";
         document.querySelectorAll('input[name="alineacion"]').forEach(r => {
             if (r.checked) alineacion = r.value;
         });
-
+    
         if (!alineacion) {
             camposInvalidos.push("Alineación");
         }
-
+    
         if (tipoGestion === "masiva" && archivoMasivo.files.length === 0) {
             camposInvalidos.push("Archivo de carga masiva");
         }
-
+    
         if (camposInvalidos.length > 0) {
             return Swal.fire({
                 icon: 'warning',
@@ -125,7 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 confirmButtonColor: '#f59e0b'
             });
         }
-
+    
+        // Crear y enviar FormData
         const formData = new FormData();
         formData.append("letra", letra.value);
         formData.append("tamañoLetra", tamañoLetra.value);
@@ -137,19 +175,19 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("contenido", contenido.value.trim());
         formData.append("alineacion", alineacion);
         formData.append("tipoGestion", tipoGestion);
-
+    
         if (tipoGestion === "masiva") {
             formData.append("archivoMasivo", archivoMasivo.files[0]);
         }
-
+    
         try {
             const response = await fetch("http://127.0.0.1:5000/crear_memorandum", {
                 method: "POST",
                 body: formData
             });
-
+    
             if (!response.ok) throw new Error("Error al generar el documento");
-
+    
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -157,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
             a.download = tipoGestion === "masiva" ? "memorandums.zip" : "memorandum.docx";
             document.body.appendChild(a);
             a.click();
-
+    
             setTimeout(() => {
                 a.remove();
                 Swal.fire({
@@ -178,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
-
+    
     cancelarBtn.addEventListener("click", () => {
         limpiarFormulario();
     });

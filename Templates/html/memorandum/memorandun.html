@@ -87,21 +87,34 @@
         </div>
 
         <!-- Sección 2: Tipo de Gestión -->
-        <div class="border p-4 rounded-md">
-            <h2 class="text-sm font-semibold text-gray-700 mb-2">Selecciona tipo gestión</h2>
-            <div class="flex gap-6">
-                <label><input type="radio" name="tipoGestion" value="individual" class="mr-1">Individual</label>
-                <label><input type="radio" name="tipoGestion" value="masiva" class="mr-1">Masiva</label>
+        <div class="border p-4 rounded-md space-y-4">
+            <h2 class="text-sm font-semibold text-gray-700">Selecciona tipo de gestión</h2>
+            <div class="flex gap-6 text-sm text-gray-600">
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="tipoGestion" value="individual" class="text-blue-600 focus:ring-blue-500">
+                <span>Individual</span>
+              </label>
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="tipoGestion" value="masiva" class="text-blue-600 focus:ring-blue-500">
+                <span>Masiva</span>
+              </label>
             </div>
-            <div id="cargaMasivaContainer" class="hidden mt-4 space-y-2">
-                <button id="cargarDatos" disabled class="bg-gray-300 text-white px-4 py-2 rounded-md">Cargar Datos</button>
-                <input type="file" id="archivoMasivo" accept=".xlsx,.csv" class="hidden" />
-                <span id="nombreArchivo" class="ml-4 px-3 py-1 bg-gray-100 border border-gray-300 text-sm text-gray-700 rounded-md shadow-sm">
-                    Ningún archivo seleccionado
-                  </span>
-                  
+          
+            <div>
+              <h2 class="text-sm font-semibold text-gray-700 mb-1">Formato de salida:</h2>
+              <div class="flex gap-6 text-sm text-gray-600">
+                <label class="inline-flex items-center gap-1">
+                  <input type="radio" name="formato" value="docx" class="text-green-600 focus:ring-green-500">
+                  <span>.docx</span>
+                </label>
+                <label class="inline-flex items-center gap-1">
+                  <input type="radio" name="formato" value="pdf" class="text-red-600 focus:ring-red-500" checked>
+                  <span>.pdf</span>
+                </label>
+              </div>
             </div>
-        </div>
+          </div>
+          
 
         <!-- Sección 3: Contenido -->
         <div class="border p-4 rounded-md grid gap-4">
