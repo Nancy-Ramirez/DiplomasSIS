@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuración</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="w-full h-screen flex">
+      
+      <!-- Menú lateral -->
+      <aside class="w-1/4 bg-white shadow-lg p-4 flex flex-col gap-4 border-r">
+        <button class="text-left px-4 py-2 rounded hover:bg-blue-100 font-medium" onclick="showPanel('general')">General</button>
+        <button class="text-left px-4 py-2 rounded hover:bg-blue-100 font-medium" onclick="showPanel('integraciones')">Integraciones</button>
+  
+        <div class="mt-auto">
+          <button class="w-full text-white px-4 py-2 rounded bg-[#E84A5F] hover:bg-[#d23e52]">Reestablecer</button>
+          <button class="w-full text-white mt-2 px-4 py-2 rounded bg-[#3B9C9C] hover:bg-[#338888]" onclick="guardarRuta()">Guardar cambios</button>
+        </div>
+      </aside>
+  
+      <!-- Panel derecho -->
+      <main class="w-3/4 p-6 overflow-y-auto">
+        <div id="panel-general" class="panel">
+          <h2 class="text-2xl font-semibold mb-4">Configuración General</h2>
+          <label class="block mb-2">Carpeta destino:</label>
+          <input type="text" id="rutaDestino" class="w-full p-2 border rounded mb-4" placeholder="Seleccionar carpeta...">
+          <label class="block mb-2">Idioma:</label>
+          <select class="w-1/2 p-2 border rounded">
+            <option>Español</option>
+            <option>Inglés</option>
+          </select>
+        </div>
+  
+        <div id="panel-integraciones" class="panel hidden">
+          <h2 class="text-2xl font-semibold mb-4">Integraciones</h2>
+          <label class="block mb-2">Archivo de credenciales JSON:</label>
+          <input type="file" id="archivoCredenciales" class="mb-4 block border p-2 rounded w-full" />
+        
+          <label class="block mb-2">ID de carpeta en Google Drive:</label>
+          <input type="text" id="carpetaDrive" placeholder="Ej: 1A2B3C4D..." class="mb-4 block border p-2 rounded w-full" />
+        
+          <button onclick="guardarIntegracion()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            Guardar Integración
+          </button>
+        </div>
+      </main>
+    </div>
+
+  <script>
+    function showPanel(panelId) {
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(panel => panel.classList.add('hidden'));
+      document.getElementById('panel-' + panelId).classList.remove('hidden');
+    }
+
+    function guardarRuta() {
+      const ruta = document.getElementById('rutaDestino').value;
+      fetch('http://localhost:5000/guardar-ruta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rutaDestino: ruta })
+      })
+      .then(res => res.json())
+      .then(data => alert("✅ Ruta guardada"))
+      .catch(err => alert("❌ Error al guardar: " + err));
+    }
+
+    // Mostrar General por defecto
+    window.onload = () => showPanel('general');
+  </script>
+
+</body>
+</html>
