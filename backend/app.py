@@ -9,6 +9,7 @@ import traceback
 import json
 import pandas as pd
 from zipfile import ZipFile
+from configuracion import config_bp
 
 app = Flask(__name__)
 
@@ -129,3 +130,4 @@ def crear_memorandum():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+app.register_blueprint(config_bp)

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Configuración</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-white min-h-screen">
     <div class="w-full h-screen flex">
@@ -36,6 +37,9 @@
         <div id="panel-integraciones" class="panel hidden">
           <h2 class="text-2xl font-semibold mb-4">Integraciones</h2>
           <label class="block mb-2">Archivo de credenciales JSON:</label>
+          <p id="estadoCredencial" class="text-sm text-gray-600 mb-4 italic">
+            ❌ No se ha cargado ningún archivo
+          </p>
           <input type="file" id="archivoCredenciales" class="mb-4 block border p-2 rounded w-full" />
         
           <label class="block mb-2">ID de carpeta en Google Drive:</label>
@@ -48,28 +52,7 @@
       </main>
     </div>
 
-  <script>
-    function showPanel(panelId) {
-      const panels = document.querySelectorAll('.panel');
-      panels.forEach(panel => panel.classList.add('hidden'));
-      document.getElementById('panel-' + panelId).classList.remove('hidden');
-    }
-
-    function guardarRuta() {
-      const ruta = document.getElementById('rutaDestino').value;
-      fetch('http://localhost:5000/guardar-ruta', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rutaDestino: ruta })
-      })
-      .then(res => res.json())
-      .then(data => alert("✅ Ruta guardada"))
-      .catch(err => alert("❌ Error al guardar: " + err));
-    }
-
-    // Mostrar General por defecto
-    window.onload = () => showPanel('general');
-  </script>
+    <script src="../../js/configuracion/config.js"></script>
 
 </body>
 </html>
