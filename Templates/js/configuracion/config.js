@@ -14,7 +14,7 @@ function showPanel(panelId) {
   
   // Cargar datos de integración desde el backend
   function cargarIntegracion() {
-    fetch("http://localhost:5000/cargar-configuracion")
+    fetch("http://localhost:5000/configuracion/cargar-configuracion")
       .then(res => res.json())
       .then(data => {
         const folderInput = document.getElementById("carpetaDrive");
@@ -55,7 +55,7 @@ function showPanel(panelId) {
     formData.append("credenciales", file);
     formData.append("folder_id", folderId);
   
-    fetch("http://localhost:5000/guardar-integracion", {
+    fetch("http://localhost:5000/configuracion/guardar-integracion", {
       method: "POST",
       body: formData
     })
@@ -93,7 +93,7 @@ function showPanel(panelId) {
   
   // (Opcional) Cargar la ruta en el panel General
   function cargarGeneral() {
-    fetch("http://localhost:5000/cargar-configuracion")
+    fetch("http://localhost:5000/configuracion/cargar-configuracion")
       .then(res => res.json())
       .then(data => {
         if (data.general && data.general.ruta_destino) {

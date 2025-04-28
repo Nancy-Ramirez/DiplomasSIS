@@ -199,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/recibir_datos", {
+            const response = await fetch("http://127.0.0.1:5000/documento/recibir-datos", {
                 method: "POST",
                 body: formData,
             });

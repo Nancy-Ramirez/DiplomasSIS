@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     
         try {
-            const response = await fetch("http://127.0.0.1:5000/crear_memorandum", {
+            const response = await fetch("http://127.0.0.1:5000/memorandum/crear_memorandum", {
                 method: "POST",
                 body: formData
             });

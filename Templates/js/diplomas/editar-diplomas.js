@@ -893,6 +893,7 @@ canvas.addEventListener("mouseup", () => {
 });
 
 // Guardar los cambios en el JSON
+/*
 async function guardarDiploma() {
     try {
         const response = await fetch("/save-diploma", {
@@ -913,6 +914,82 @@ async function guardarDiploma() {
         alert("Error al guardar el diploma: " + error.message);
     }
 }
+*/
+async function guardarDiploma() {
+    try {
+      // 1️⃣ Exportar el canvas como imagen (formato PNG)
+      const imageBlob = await new Promise(resolve => {
+        canvas.toBlob(resolve, 'image/png');
+      });
+  
+      if (!imageBlob) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo exportar el diploma.',
+          confirmButtonColor: '#E84A5F'
+        });
+        return;
+      }
+  
+      // 2️⃣ Subir la imagen temporalmente al backend
+      const formData = new FormData();
+      formData.append('diplomaImagen', imageBlob, 'diploma.png');
+  
+      const response = await fetch('http://127.0.0.1:5000/guardar-diploma-imagen', {
+        method: 'POST',
+        body: formData
+      });
+  
+      const data = await response.json();
+  
+      if (data.status === "ok") {
+        // 3️⃣ Mostrar SweetAlert para seleccionar el Excel
+        Swal.fire({
+          title: 'Seleccionar archivo Excel',
+          text: 'Ahora seleccioná el archivo Excel con los datos de los estudiantes',
+          input: 'file',
+          inputAttributes: {
+            accept: '.xlsx',
+            'aria-label': 'Subí tu archivo Excel'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Cargar Excel',
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#3B9C9C',
+          cancelButtonColor: '#E84A5F',
+          preConfirm: (file) => {
+            if (!file) {
+              Swal.showValidationMessage('Debes seleccionar un archivo Excel');
+            }
+            return file;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const excelFile = result.value;
+            subirExcelParaDiplomas(excelFile);
+          }
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al guardar',
+          text: data.message,
+          confirmButtonColor: '#E84A5F'
+        });
+      }
+  
+    } catch (error) {
+      console.error('Error al guardar el diploma:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar el diploma.',
+        confirmButtonColor: '#E84A5F'
+      });
+    }
+  }
+  
 
 // Inicializar
 cargarDiploma();
