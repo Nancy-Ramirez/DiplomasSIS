@@ -1,64 +1,74 @@
-# ✅ backend/routes/diploma_routes.py
-
-from flask import Blueprint, request, jsonify, send_file
-import os
-import traceback
+from flask import Blueprint, request, jsonify
 import pandas as pd
-from services.diploma_service import generar_diploma
-from werkzeug.utils import secure_filename
-from zipfile import ZipFile
+import base64, io, os, json
+from PIL import Image, ImageDraw, ImageFont
 
-diploma_bp = Blueprint('diploma', __name__)
+diploma_bp = Blueprint("diploma_bp", __name__)
 
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'diplomas')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-@diploma_bp.route('/generar-diploma', methods=['POST'])
-def generar_diploma_endpoint():
+@diploma_bp.route("/generar-masivo", methods=["POST"])
+def generar_diplomas_masivo():
     try:
-        if not request.form:
-            return jsonify({"error": "Formato no soportado. Usa multipart/form-data"}), 415
+        image_data = request.form.get("imagen")
+        config_data = request.form.get("estructura")
+        excel_file = request.files.get("excel")
 
-        datos = request.form.to_dict()
-        tipo_generacion = datos.get("tipoGeneracion", "individual")
+        if not image_data or not config_data or not excel_file:
+            return jsonify({"status": "error", "message": "Faltan datos (imagen, configuración o Excel)"}), 400
 
-        if tipo_generacion == "masiva":
-            archivo_masivo = request.files.get("archivoMasivo")
-            if not archivo_masivo:
-                return jsonify({"error": "Falta el archivo para carga masiva"}), 400
+        base64_data = image_data.split(",")[1] if "," in image_data else image_data
+        image_binary = base64.b64decode(base64_data)
+        original_image = Image.open(io.BytesIO(image_binary)).convert("RGBA")
 
-            if archivo_masivo.filename.endswith(".xlsx"):
-                df = pd.read_excel(archivo_masivo)
-            elif archivo_masivo.filename.endswith(".csv"):
-                df = pd.read_csv(archivo_masivo)
-            else:
-                return jsonify({"error": "Formato de archivo no soportado"}), 400
+        df = pd.read_excel(excel_file)
+        if df.empty:
+            return jsonify({"status": "error", "message": "El Excel está vacío"}), 400
 
-            zip_path = os.path.join(UPLOAD_FOLDER, "diplomas_masivos.zip")
-            with ZipFile(zip_path, "w") as zipf:
-                for index, row in df.iterrows():
-                    datos_individuales = datos.copy()
-                    datos_individuales["nombre"] = row.get("Nombre", "Participante")
-                    doc_path, error = generar_diploma(datos_individuales)
+        config = json.loads(config_data)
 
-                    if error or not doc_path:
-                        continue
+        font_path = "C:/Windows/Fonts/arial.ttf"
+        if not os.path.exists(font_path):
+            font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-                    nombre_doc = f"diploma_{index+1}.docx"
-                    zipf.write(doc_path, arcname=nombre_doc)
+        font_cache = {}
+        os.makedirs("diplomas_generados", exist_ok=True)
 
-            return send_file(zip_path, as_attachment=True, download_name="diplomas_masivos.zip")
+        for i, row in df.iterrows():
+            img = original_image.copy()
+            draw = ImageDraw.Draw(img)
 
-        # Individual
-        doc_path, error = generar_diploma(datos)
+            for text_item in config.get("text", []):
+                raw_content = text_item["content"]
+                content = raw_content
 
-        if error or not doc_path:
-            return jsonify({"error": error or "No se pudo generar el diploma"}), 500
+                for col in df.columns:
+                    tag = f"{{{{{col.strip()}}}}}"
+                    if tag in content:
+                        content = content.replace(tag, str(row[col]))
 
-        return send_file(doc_path, as_attachment=True, download_name="diploma_generado.docx")
+                if content != raw_content:
+                    font_key = (
+                        text_item["font"]["family"],
+                        text_item["font"]["size"],
+                        text_item["font"].get("weight", "normal")
+                    )
+                    if font_key not in font_cache:
+                        font_cache[font_key] = ImageFont.truetype(font_path, text_item["font"]["size"])
+                    font = font_cache[font_key]
+
+                    draw.text(
+                        (text_item["position"]["x"], text_item["position"]["y"]),
+                        content,
+                        font=font,
+                        fill=text_item["font"].get("color", "#000000")
+                    )
+
+            nombre_base = str(row[df.columns[0]]).strip().replace(" ", "_").replace("/", "-")
+            output_path = f"diplomas_generados/diploma_{nombre_base}_{i+1}.png"
+            img.save(output_path)
+
+        return jsonify({"status": "ok", "message": "🎓 Diplomas generados exitosamente"})
 
     except Exception as e:
+        import traceback
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
-
-# Luego seguiría el services/diploma_service.py similar al anterior, ¡avisame si continuamos!
+        return jsonify({"status": "error", "message": str(e)}), 500
