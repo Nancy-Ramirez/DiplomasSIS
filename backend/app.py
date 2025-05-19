@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # Registrar los Blueprints
 app.register_blueprint(configuracion_bp, url_prefix='/configuracion')
-app.register_blueprint(diploma_bp, url_prefix='/diploma')
+app.register_blueprint(diploma_bp, url_prefix='/diplomas')
 app.register_blueprint(documento_bp, url_prefix='/documento')
 app.register_blueprint(memorandum_bp, url_prefix='/memorandum')
 
@@ -17,4 +17,4 @@ app.register_blueprint(memorandum_bp, url_prefix='/memorandum')
 def home():
     return "¡Servidor Flask en ejecución!"
 
-# 🚫 NO pongas app.run() aquí.
+# NO pongas app.run() aquí.

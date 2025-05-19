@@ -43,6 +43,7 @@ async function cargarDiploma() {
     try {
         const response = await fetch("../../data/diploma.json");
         diplomaData = await response.json();
+        window.plantillaData = diplomaData;
         canvas.width = diplomaData.canvas.width;
         canvas.height = diplomaData.canvas.height;
 
@@ -455,6 +456,7 @@ function addImageFromFile(event) {
                     toggleSection("imageSection");
                     actualizarEditor();
                 }
+                console.long("Ruta de la imagen:", imagePath);
                 // Limpiar el input para evitar múltiples eventos
                 imageUpload.value = "";
             };

@@ -346,13 +346,20 @@
         </div>
       </div>
 
+      <div>
+        <label>
+        <input type="checkbox" id="chkGenerarQR" /> Generar QR y subir a Google Drive
+        </label>
+      </div>
+
       <button
-        id="descargar"
+        id="btnGuardarCambios"
         class="mt-4 w-full bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700 text-sm"
       >
         Guardar Cambios
       </button>
     </div>
+
 
     <!-- Área de Canvas -->
     <div class="flex-1 flex items-center justify-center">
@@ -363,6 +370,8 @@
         class="bg-white shadow-lg"
       ></canvas>
     </div>
+
+    <input type="file" id="archivoEstudiantes" accept=".csv,.xlsx" class="hidden" />
 
     <script>
       function toggleSection(sectionId) {
