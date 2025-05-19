@@ -123,7 +123,14 @@ def generar_diplomas_masivos(file_storage, ruta_plantilla, generar_qr_flag=False
     zip_path = os.path.join("diplomas_generados", "diplomas.zip")
     with zipfile.ZipFile(zip_path, "w") as z:
         for ruta in rutas_diplomas:
-            z.write(ruta, os.path.basename(ruta))
+            nombre_archivo = os.path.basename(ruta)
+            z.write(ruta, nombre_archivo)  # Solo el diploma de esta ejecución
+
+            # Si se pidió QR, solo agregamos el QR con el mismo nombre
+            if generar_qr_flag:
+                qr_path = os.path.join("diplomas_qr", nombre_archivo)
+                if os.path.exists(qr_path):
+                    z.write(qr_path, os.path.join("qr", nombre_archivo))
 
     return zip_path
 
